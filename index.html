@@ -538,8 +538,9 @@ parkourBtn.addEventListener('pointerdown',e=>{if(!e.isPrimary&&e.pointerType==='
      if(botInside(g,bx,bz,.30)&&bot.position.y<g.bottom){botState.slideTimer=Math.max(botState.slideTimer,.28);}else if(botInside(g,bx,bz,.30)&&bot.position.y<g.bottom+g.h){blockedX=true;blockedZ=true;}
    }
    for(const o of obstacles){
-     if(botInside(o,bx,bot.position.z,.30)&&bot.position.y<o.h-.16&&botState.parkourTimer<=0)blockedX=true;
-     if(botInside(o,bot.position.x,bz,.30)&&bot.position.y<o.h-.16&&botState.parkourTimer<=0)blockedZ=true;
+     const canClear=botState.parkourTimer>0&&bot.position.y+Math.max(botState.yVel,0)*.12>=o.h-.12;
+     if(botInside(o,bx,bot.position.z,.30)&&bot.position.y<o.h-.16&&!canClear)blockedX=true;
+     if(botInside(o,bot.position.x,bz,.30)&&bot.position.y<o.h-.16&&!canClear)blockedZ=true;
    }
    if(!blockedX)bot.position.x=bx;if(!blockedZ)bot.position.z=bz;clampArena(bot);
 
