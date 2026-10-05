@@ -158,7 +158,7 @@ concreteBlock(-7,13,2.2,2.2,.62);concreteBlock(7,13,2.2,2.2,.62);
 concreteBlock(-10,20,2.4,2.4,.88);concreteBlock(10,20,2.4,2.4,.88);
 // Mobile performance pass: merge static visual detail intent through conservative shadow settings.
 const arenaStaticMeshes=[];
-scene.traverse(o=>{if(o.isMesh&&o!==runner&&!o.userData.skinRole){if(o.geometry&&o.geometry.type==='BoxGeometry'&&o.position.y>3.2){o.castShadow=false}if(o.material===wearMat||o.material===edgeMat||o.material===capMat){o.castShadow=false}arenaStaticMeshes.push(o)}});
+scene.traverse(o=>{if(o.isMesh){if(o.geometry&&o.geometry.type==='BoxGeometry'&&o.position.y>3.2){o.castShadow=false}if(o.material===wearMat||o.material===edgeMat||o.material===capMat){o.castShadow=false}arenaStaticMeshes.push(o)}});
 // Cull purely decorative arena detail sooner than gameplay geometry on small/mobile GPUs.
 for(const o of arenaStaticMeshes){if(o.geometry&&o.geometry.computeBoundingSphere)o.geometry.computeBoundingSphere();o.frustumCulled=true}
 // Rendering stability: decorative meshes never participate in gameplay ray/collision intent.
