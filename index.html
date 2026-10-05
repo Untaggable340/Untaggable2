@@ -103,8 +103,10 @@ try{
  const faceMat=new THREE.MeshStandardMaterial({color:0x20252b,roughness:.75}),eyeGeo=new THREE.SphereGeometry(.032,8,6);
  const eyeL=new THREE.Mesh(eyeGeo,faceMat),eyeR=eyeL.clone();eyeL.position.set(-.09,2.00,.265);eyeR.position.set(.09,2.00,.265);runner.add(eyeL,eyeR);
  const nose=new THREE.Mesh(new THREE.ConeGeometry(.03,.085,8),new THREE.MeshStandardMaterial({color:0xb9785d,roughness:.8}));nose.rotation.x=Math.PI/2;nose.position.set(0,1.93,.292);runner.add(nose);
- const armGeo=new THREE.CapsuleGeometry(.09,.52,4,8),armL=new THREE.Mesh(armGeo,skin),armR=armL.clone();armL.position.set(-.43,1.27,0);armR.position.set(.43,1.27,0);armL.rotation.z=-.08;armR.rotation.z=.08;runner.add(armL,armR);
- const handGeo=new THREE.SphereGeometry(.105,10,8),handL=new THREE.Mesh(handGeo,skin),handR=handL.clone();handL.position.set(-.46,.91,0);handR.position.set(.46,.91,0);runner.add(handL,handR);
+ const pelvis=new THREE.Mesh(new THREE.BoxGeometry(.55,.24,.34),pants);pelvis.position.y=.82;runner.add(pelvis);
+ const shoulders=new THREE.Group();shoulders.position.y=1.48;runner.add(shoulders);
+ const armGeo=new THREE.CapsuleGeometry(.09,.52,4,8),armL=new THREE.Mesh(armGeo,skin),armR=armL.clone();armL.position.set(-.43,1.27,0);armR.position.set(.43,1.27,0);armL.rotation.z=-.08;armR.rotation.z=.08;shoulders.add(armL,armR);armL.position.set(-.43,-.21,0);armR.position.set(.43,-.21,0);
+ const handGeo=new THREE.SphereGeometry(.105,10,8),handL=new THREE.Mesh(handGeo,skin),handR=handL.clone();handL.position.set(-.46,.91,0);handR.position.set(.46,.91,0);shoulders.add(handL,handR);handL.position.set(-.46,-.57,0);handR.position.set(.46,-.57,0);
  const frontPatch=new THREE.Mesh(new THREE.BoxGeometry(.20,.27,.035),new THREE.MeshStandardMaterial({color:0xd8e2e8,roughness:.7}));frontPatch.position.set(0,1.26,.35);runner.add(frontPatch);
  const backPatch=new THREE.Mesh(new THREE.BoxGeometry(.25,.29,.035),new THREE.MeshStandardMaterial({color:0x17202a,roughness:.75}));backPatch.position.set(0,1.26,-.35);runner.add(backPatch);
  const legL=new THREE.Mesh(new THREE.CapsuleGeometry(.115,.58,4,8),pants),legR=legL.clone();legL.position.set(-.17,.49,0);legR.position.set(.17,.49,0);runner.add(legL,legR);
@@ -128,7 +130,7 @@ const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,act
 let game={started:false,totalRounds:1,round:1,time:45,between:false,paused:false,offlineBot:true};
 let cameraHeading=Math.PI,movementHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
 function resetRound(){
- runner.position.set(0,0,10);state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;
+ runner.position.set(0,0,10);state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;
  bot.position.set(0,0,17);botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;
  botState.headStart=5;botState.headStartDone=false;game.time=45;game.between=false;cameraHeading=state.facing;movementHeading=state.facing;cameraPitch=.05;
 }
@@ -159,7 +161,7 @@ const tutorial=document.getElementById('tutorial');document.getElementById('tuto
 function setPaused(v){
  if(!game.offlineBot||!game.started)return;
  game.paused=v;pauseMenu.style.display=v?'flex':'none';
- if(v){state.sprint=false;state.slide=false;lookPointer=null;sprintBtn?.classList.remove('active');}
+ if(v){state.sprint=false;state.slide=false;state.crouch=false;state.slideTimer=0;lookPointer=null;sprintBtn?.classList.remove('active');}
 }
 pauseBtn.addEventListener('click',()=>setPaused(true));
 document.getElementById('resumeGame').addEventListener('click',()=>setPaused(false));
@@ -442,8 +444,23 @@ canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercan
        }
      }
    }
-   // simple run motion
-   const moving=mag>.12;const phase=now*.012*(wantsSprint?1.4:1);legL.rotation.x=moving?Math.sin(phase)*.55:0;legR.rotation.x=moving?-Math.sin(phase)*.55:0;torso.rotation.z=state.slide?.34:0;runner.scale.y=(state.crouch||state.slide)?.62:1;
+   // Full-body procedural animation: responsive third-person action-game feel.
+   const moving=mag>.12,air=!state.onGround,sliding=state.slide&&state.slideTimer>0,crouching=state.crouch&&!sliding;
+   const gait=wantsSprint?1.55:1.0,phase=now*.012*gait,step=moving?Math.sin(phase):0,opposite=-step;
+   const stride=wantsSprint?.78:.52,armSwing=wantsSprint?.72:.48;
+   legL.rotation.x=air?-.28:step*stride;legR.rotation.x=air?.38:opposite*stride;
+   armL.rotation.x=air?.48:opposite*armSwing;armR.rotation.x=air?.48:step*armSwing;
+   armL.rotation.z=air?-.22:-.08;armR.rotation.z=air?.22:.08;
+   let lean=moving?(wantsSprint?.13:.055):0;
+   torso.rotation.x=lean;torso.rotation.z=0;pelvis.rotation.y=moving?step*.055:0;shoulders.rotation.y=moving?-step*.07:0;
+   torso.position.y=1.25+(moving&&!air?Math.abs(Math.sin(phase*2))*.025:0);
+   head.position.y=1.98+(moving&&!air?Math.abs(Math.sin(phase*2))*.018:0);
+   if(air){torso.rotation.x=state.yVel>0?-.10:.12;shoulders.rotation.x=state.yVel>0?-.08:.10;}
+   else shoulders.rotation.x=0;
+   if(crouching){runner.scale.y=.72;torso.rotation.x=.18;legL.rotation.x=.42;legR.rotation.x=.42;armL.rotation.x=-.28;armR.rotation.x=-.28;}
+   else if(sliding){runner.scale.y=.62;torso.rotation.x=.55;torso.rotation.z=.08;legL.rotation.x=1.0;legR.rotation.x=.62;armL.rotation.x=-.58;armR.rotation.x=-.30;}
+   else runner.scale.y=1;
+   if(state.parkourTimer>0){torso.rotation.x=-.18;armL.rotation.x=-1.15;armR.rotation.x=-1.15;legL.rotation.x=.55;legR.rotation.x=-.18;}
    updateBot(dt,now);
    // Free-look camera: right-thumb camera movement does not directly steer the runner.
    // After release, it recenters slowly so the player has time to inspect their surroundings.
