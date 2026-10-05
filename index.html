@@ -343,14 +343,14 @@ const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,act
  const state={vel:new THREE.Vector3(),yVel:0,onGround:true,stamina:150,sprint:false,slide:false,parkourBoost:0,parkourTimer:0,facing:Math.PI,joyX:0,joyY:0,support:null,autoSprint:false,lastSprintTap:0,crouch:false,slideTimer:0};
  const keys={}; let last=performance.now();
 let game={started:false,totalRounds:1,round:1,time:60,between:false,paused:false,offlineBot:true};let roundTransitionTimer=null;
-let cameraHeading=Math.PI,movementHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
+let cameraHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
 let sprintPointer=null,slidePointer=null,jid=null;
 function resetRound(){if(roundTransitionTimer!==null){clearTimeout(roundTransitionTimer);roundTransitionTimer=null;}
  last=performance.now();
  Object.keys(keys).forEach(k=>keys[k]=false);
  runner.position.set(0,0,10);state.facing=Math.PI;runner.rotation.y=state.facing;torso.rotation.set(0,0,0);legL.rotation.x=0;legR.rotation.x=0;armL.rotation.x=0;armR.rotation.x=0;runner.scale.set(...characterLooks[selectedCharacter].scale);state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.joyX=0;state.joyY=0;lookPointer=null;jid=null;sprintPointer=null;slidePointer=null;sprintBtn?.classList.remove('auto','active');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');
  bot.position.set(0,0,17);botState.facing=Math.PI;bot.rotation.y=botState.facing;chooseBotCharacter();botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;botState.actionCooldown=0;botState.slideTimer=0;botState.parkourTimer=0;if(botLegL)botLegL.rotation.x=0;if(botLegR)botLegR.rotation.x=0;if(botArmL)botArmL.rotation.x=0;if(botArmR)botArmR.rotation.x=0;if(botTorso)botTorso.rotation.x=0;
- bot.scale.set(...characterLooks[botCharacter].scale);botState.headStart=5;botState.headStartDone=false;botState.headStartShown=null;game.time=60;game.between=false;pauseBtn.style.display=game.offlineBot?'block':'none';cameraHeading=state.facing;movementHeading=state.facing;cameraPitch=.05;
+ bot.scale.set(...characterLooks[botCharacter].scale);botState.headStart=5;botState.headStartDone=false;botState.headStartShown=null;game.time=60;game.between=false;pauseBtn.style.display=game.offlineBot?'block':'none';cameraHeading=state.facing;cameraPitch=.05;
 }
 function finishRound(reason){
  if(game.between||!game.started)return;game.between=true;
@@ -614,8 +614,6 @@ canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercan
      state.facing+=faceDelta;
      runner.rotation.y=state.facing;
 
-     // Movement heading simply records actual travel; it no longer modifies joystick input.
-     movementHeading=targetFacing;
    }
    if(state.parkourTimer>0){state.parkourTimer=Math.max(0,state.parkourTimer-dt);speed=Math.max(speed,state.parkourBoost);desired.set(Math.sin(state.facing),0,Math.cos(state.facing));if(state.parkourTimer===0)state.parkourBoost=0}
    const nx=runner.position.x+desired.x*speed*dt,nz=runner.position.z+desired.z*speed*dt;
