@@ -450,7 +450,7 @@ function blocked(nx,nz){
   return false;
 }
  addEventListener('keydown',e=>{if(!game.started||game.paused||game.between)return;keys[e.key.toLowerCase()]=true;if(e.code==='Space')jump();if(e.key.toLowerCase()==='e')parkour()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
- const joy=document.getElementById('joy'),knob=document.getElementById('knob');let jid=null;function joySet(e){const r=joy.getBoundingClientRect();let x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2,m=Math.hypot(x,y),lim=43;if(m>lim){x*=lim/m;y*=lim/m}let nx=x/lim,ny=y/lim;const dead=.025,raw=Math.hypot(nx,ny);if(raw<dead){nx=0;ny=0}else{const scaled=Math.pow((raw-dead)/(1-dead),.82),s=scaled/raw;nx*=s;ny*=s}state.joyX=nx;state.joyY=ny;knob.style.transform=`translate(${x}px,${y}px)`}joy.addEventListener('pointerdown',e=>{if(!game.started||game.paused||game.between)return;jid=e.pointerId;joy.setPointerCapture(jid);joySet(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===jid)joySet(e)});function jend(e){if(e.pointerId===jid){jid=null;state.joyX=state.joyY=0;knob.style.transform=''}}joy.addEventListener('pointerup',jend);joy.addEventListener('pointercancel',jend);
+ const joy=document.getElementById('joy'),knob=document.getElementById('knob');let jid=null;function joySet(e){const r=joy.getBoundingClientRect();let x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2,m=Math.hypot(x,y),lim=43;if(m>lim){x*=lim/m;y*=lim/m}let nx=x/lim,ny=y/lim;const dead=.025,raw=Math.hypot(nx,ny);if(raw<dead){nx=0;ny=0}else{const scaled=Math.pow((raw-dead)/(1-dead),.82),s=scaled/raw;nx*=s;ny*=s}state.joyX=nx;state.joyY=ny;knob.style.transform=`translate(${x}px,${y}px)`}joy.addEventListener('pointerdown',e=>{if(!game.started||game.paused||game.between)return;jid=e.pointerId;joy.setPointerCapture(jid);joySet(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===jid)joySet(e)});function jend(e){if(e.pointerId===jid){jid=null;state.joyX=state.joyY=0;knob.style.transform=''}}joy.addEventListener('pointerup',jend);joy.addEventListener('pointercancel',jend);joy.addEventListener('lostpointercapture',jend);
  function hold(id,key){const el=document.getElementById(id);let activePointer=null;el.addEventListener('pointerdown',e=>{if(!game.started||game.paused||game.between||activePointer!==null)return;activePointer=e.pointerId;state[key]=true;el.classList.add('active');el.setPointerCapture(e.pointerId)});const up=e=>{if(activePointer!==null&&e.pointerId!==activePointer)return;activePointer=null;state[key]=false;el.classList.remove('active')};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('lostpointercapture',up)}
 const sprintBtn=document.getElementById('sprint');
 sprintBtn.addEventListener('pointerdown',e=>{
@@ -471,7 +471,7 @@ const sprintRelease=()=>{state.sprint=false;sprintBtn.classList.remove('active')
 sprintBtn.addEventListener('pointerup',sprintRelease);sprintBtn.addEventListener('pointercancel',sprintRelease);
 const slideBtn=document.getElementById('slide');
 slideBtn.addEventListener('pointerdown',e=>{if(!game.started||game.paused||game.between)return;state.crouch=true;state.slide=true;state.slideTimer=(state.sprint||state.autoSprint||keys.shift)?0.78:0;slideBtn.classList.add('active');slideBtn.setPointerCapture(e.pointerId)});
-const slideUp=()=>{state.crouch=false;if(state.slideTimer<=0)state.slide=false;slideBtn.classList.remove('active')};slideBtn.addEventListener('pointerup',slideUp);slideBtn.addEventListener('pointercancel',slideUp);
+const slideUp=()=>{state.crouch=false;if(state.slideTimer<=0)state.slide=false;slideBtn.classList.remove('active')};slideBtn.addEventListener('pointerup',slideUp);slideBtn.addEventListener('pointercancel',slideUp);slideBtn.addEventListener('lostpointercapture',slideUp);
 document.getElementById('jump').addEventListener('pointerdown',jump);document.getElementById('parkour').addEventListener('pointerdown',parkour);
  function botInside(o,x,z,pad=0){return x>o.x-o.w/2-pad&&x<o.x+o.w/2+pad&&z>o.z-o.d/2-pad&&z<o.z+o.d/2+pad}
  function botFrontObstacle(range=1.25){
@@ -578,7 +578,7 @@ canvas.addEventListener('pointermove',e=>{
  cameraHeading-=dx*.0048;cameraPitch=Math.max(-.20,Math.min(.42,cameraPitch-dy*.004));
 });
 function endLook(e){if(e.pointerId===lookPointer)lookPointer=null}
-canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercancel',endLook);
+canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercancel',endLook);canvas.addEventListener('lostpointercapture',endLook);
  function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
   // Mobile lifecycle safety: never leave movement/look inputs latched after the app loses focus.
   function releaseInputs(){Object.keys(keys).forEach(k=>keys[k]=false);state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;lookPointer=null;jid=null;sprintBtn.classList.remove('active','auto');slideBtn.classList.remove('active');knob.style.transform='';}
