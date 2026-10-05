@@ -340,7 +340,7 @@ if(hp.cap)hp.cap.scale.set(l.hairStyle==='close'?.90:.97,l.hairStyle==='close'?.
 }
 function chooseBotCharacter(){const choices=charNames.filter(n=>n!==selectedCharacter);applyBotCharacter(choices[Math.floor(Math.random()*choices.length)]);}
 const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,actionCooldown:0,slideTimer:0,parkourTimer:0,headStart:5,headStartDone:false,headStartShown:null};
- const state={vel:new THREE.Vector3(),yVel:0,onGround:true,stamina:150,sprint:false,slide:false,parkourBoost:0,parkourTimer:0,facing:Math.PI,joyX:0,joyY:0,support:null,autoSprint:false,lastSprintTap:0,crouch:false,slideTimer:0};
+ const state={yVel:0,onGround:true,stamina:150,sprint:false,slide:false,parkourBoost:0,parkourTimer:0,facing:Math.PI,joyX:0,joyY:0,support:null,autoSprint:false,lastSprintTap:0,crouch:false,slideTimer:0};
  const keys={}; let last=performance.now();
 let game={started:false,totalRounds:1,round:1,time:60,between:false,paused:false,offlineBot:true};let roundTransitionTimer=null;
 let cameraHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
