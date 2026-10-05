@@ -340,10 +340,10 @@ const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,act
  const keys={}; let last=performance.now();
 let game={started:false,totalRounds:1,round:1,time:60,between:false,paused:false,offlineBot:true};let roundTransitionTimer=null;
 let cameraHeading=Math.PI,movementHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
-let sprintPointer=null,jid=null;
+let sprintPointer=null,slidePointer=null,jid=null;
 function resetRound(){if(roundTransitionTimer!==null){clearTimeout(roundTransitionTimer);roundTransitionTimer=null;}
  Object.keys(keys).forEach(k=>keys[k]=false);
- runner.position.set(0,0,10);state.facing=Math.PI;runner.rotation.y=state.facing;torso.rotation.set(0,0,0);legL.rotation.x=0;legR.rotation.x=0;armL.rotation.x=0;armR.rotation.x=0;runner.scale.y=characterLooks[selectedCharacter].scale[1];state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.joyX=0;state.joyY=0;lookPointer=null;jid=null;sprintPointer=null;sprintBtn?.classList.remove('auto','active');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');
+ runner.position.set(0,0,10);state.facing=Math.PI;runner.rotation.y=state.facing;torso.rotation.set(0,0,0);legL.rotation.x=0;legR.rotation.x=0;armL.rotation.x=0;armR.rotation.x=0;runner.scale.y=characterLooks[selectedCharacter].scale[1];state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.joyX=0;state.joyY=0;lookPointer=null;jid=null;sprintPointer=null;slidePointer=null;sprintBtn?.classList.remove('auto','active');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');
  bot.position.set(0,0,17);botState.facing=Math.PI;bot.rotation.y=botState.facing;chooseBotCharacter();botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;botState.actionCooldown=0;botState.slideTimer=0;botState.parkourTimer=0;botState.parkourBoost=0;if(botLegL)botLegL.rotation.x=0;if(botLegR)botLegR.rotation.x=0;if(botArmL)botArmL.rotation.x=0;if(botArmR)botArmR.rotation.x=0;if(botTorso)botTorso.rotation.x=0;
  botState.headStart=5;botState.headStartDone=false;botState.headStartShown=null;game.time=60;game.between=false;pauseBtn.style.display=game.offlineBot?'block':'none';cameraHeading=state.facing;movementHeading=state.facing;cameraPitch=.05;
 }
@@ -351,7 +351,7 @@ function finishRound(reason){
  if(game.between)return;game.between=true;
  game.paused=false;pauseMenu.style.display='none';pauseBtn.style.display='none';  toast(reason);
  if(game.round>=game.totalRounds){game.time=Math.max(0,game.time);
-   roundTransitionTimer=setTimeout(()=>{roundTransitionTimer=null;game.started=false;state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.yVel=0;state.support=null;lookPointer=null;jid=null;sprintPointer=null;sprintBtn?.classList.remove('active','auto');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');pauseBtn.style.display='none';document.getElementById('menu').style.display='flex';toast('MATCH COMPLETE');},900);
+   roundTransitionTimer=setTimeout(()=>{roundTransitionTimer=null;game.started=false;state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.yVel=0;state.support=null;lookPointer=null;jid=null;sprintPointer=null;slidePointer=null;sprintBtn?.classList.remove('active','auto');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');pauseBtn.style.display='none';document.getElementById('menu').style.display='flex';toast('MATCH COMPLETE');},900);
  }else{
    const nextRound=game.round+1;
    roundTransitionTimer=setTimeout(()=>{roundTransitionTimer=null;game.round=nextRound;resetRound();},900);
@@ -410,7 +410,7 @@ const tutorial=document.getElementById('tutorial');document.getElementById('tuto
 function setPaused(v){
  if(!game.offlineBot||!game.started||game.between)return;
  game.paused=v;pauseMenu.style.display=v?'flex':'none';
- if(v){Object.keys(keys).forEach(k=>keys[k]=false);state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.slide=false;state.crouch=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.joyX=state.joyY=0;lookPointer=null;jid=null;sprintPointer=null;sprintBtn?.classList.remove('active','auto');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');}
+ if(v){Object.keys(keys).forEach(k=>keys[k]=false);state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.slide=false;state.crouch=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.joyX=state.joyY=0;lookPointer=null;jid=null;sprintPointer=null;slidePointer=null;sprintBtn?.classList.remove('active','auto');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');}
 }
 pauseBtn.addEventListener('click',()=>setPaused(true));
 document.getElementById('resumeGame').addEventListener('click',()=>setPaused(false));
@@ -418,7 +418,7 @@ document.getElementById('restartGame').addEventListener('click',()=>{
  game.paused=false;game.between=false;pauseMenu.style.display='none';game.round=1;resetRound();
 });
 document.getElementById('mainMenuBtn').addEventListener('click',()=>{if(roundTransitionTimer!==null){clearTimeout(roundTransitionTimer);roundTransitionTimer=null;}
- game.paused=false;game.started=false;game.between=false;state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.yVel=0;state.support=null;lookPointer=null;jid=null;sprintPointer=null;sprintBtn?.classList.remove('auto','active');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');pauseMenu.style.display='none';pauseBtn.style.display='none';
+ game.paused=false;game.started=false;game.between=false;state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.yVel=0;state.support=null;lookPointer=null;jid=null;sprintPointer=null;slidePointer=null;sprintBtn?.classList.remove('auto','active');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');pauseMenu.style.display='none';pauseBtn.style.display='none';
  document.getElementById('menu').style.display='flex';game.round=1;game.time=60;
 });
 document.getElementById('startGame').addEventListener('click',()=>{
@@ -473,7 +473,6 @@ sprintBtn.addEventListener('pointerdown',e=>{
 const sprintRelease=e=>{if(sprintPointer!==null&&e.pointerId!==sprintPointer)return;sprintPointer=null;state.sprint=false;sprintBtn.classList.remove('active')};
 sprintBtn.addEventListener('pointerup',sprintRelease);sprintBtn.addEventListener('pointercancel',sprintRelease);sprintBtn.addEventListener('lostpointercapture',sprintRelease);
 const slideBtn=document.getElementById('slide');
-let slidePointer=null;
 slideBtn.addEventListener('pointerdown',e=>{if(!game.started||game.paused||game.between||slidePointer!==null)return;slidePointer=e.pointerId;state.crouch=true;state.slide=true;state.slideTimer=(state.sprint||state.autoSprint||keys.shift)?0.78:0;slideBtn.classList.add('active');slideBtn.setPointerCapture(e.pointerId)});
 const slideUp=e=>{if(slidePointer!==null&&e.pointerId!==slidePointer)return;slidePointer=null;state.crouch=false;if(state.slideTimer<=0)state.slide=false;slideBtn.classList.remove('active')};slideBtn.addEventListener('pointerup',slideUp);slideBtn.addEventListener('pointercancel',slideUp);slideBtn.addEventListener('lostpointercapture',slideUp);
 document.getElementById('jump').addEventListener('pointerdown',jump);document.getElementById('parkour').addEventListener('pointerdown',parkour);
@@ -587,7 +586,7 @@ function endLook(e){if(e.pointerId===lookPointer)lookPointer=null}
 canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercancel',endLook);canvas.addEventListener('lostpointercapture',endLook);
  function resize(){renderer.setPixelRatio(targetPixelRatio());renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
   // Mobile lifecycle safety: never leave movement/look inputs latched after the app loses focus.
-  function releaseInputs(){Object.keys(keys).forEach(k=>keys[k]=false);state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;lookPointer=null;jid=null;sprintPointer=null;sprintBtn.classList.remove('active','auto');slideBtn.classList.remove('active');knob.style.transform='';}
+  function releaseInputs(){Object.keys(keys).forEach(k=>keys[k]=false);state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;lookPointer=null;jid=null;sprintPointer=null;slidePointer=null;sprintBtn.classList.remove('active','auto');slideBtn.classList.remove('active');knob.style.transform='';}
   addEventListener('blur',releaseInputs);document.addEventListener('visibilitychange',()=>{if(document.hidden){releaseInputs();if(game.started&&!game.between&&!game.paused&&game.offlineBot)setPaused(true)}});
  function loop(now){requestAnimationFrame(loop);let dt=Math.min((now-last)/1000,.033);last=now;
    if(game.started&&!game.between&&!game.paused&&botState.headStartDone){
