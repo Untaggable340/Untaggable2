@@ -553,7 +553,12 @@ parkourBtn.addEventListener('pointerdown',e=>{if(!e.isPrimary&&e.pointerType==='
    }else if(botState.support){
      if(botInside(botState.support,bot.position.x,bot.position.z,.08))bot.position.y=botState.support.h;
      else{botState.onGround=false;botState.support=null;botState.yVel=0}
-   }else bot.position.y=0;
+   }else{
+     let recovered=null,top=0;
+     for(const o of obstacles)if(botInside(o,bot.position.x,bot.position.z,.22)&&Math.abs(bot.position.y-o.h)<.38&&o.h>top){recovered=o;top=o.h}
+     if(recovered){botState.support=recovered;bot.position.y=top;botState.yVel=0}
+     else bot.position.y=0;
+   }
 
    const moving=dist>.8,phase=now*.012*(wantsSprint?1.35:1),bstep=moving?Math.sin(phase):0;
    if(botLegL&&botLegR){botLegL.rotation.x=bstep*(wantsSprint?.72:.50);botLegR.rotation.x=-bstep*(wantsSprint?.72:.50)}
