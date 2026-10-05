@@ -332,6 +332,7 @@ function applyBotCharacter(name){
  const hp={};parts.filter(o=>o.userData.skinRole==='hair').forEach(o=>hp[o.userData.hairPart]=o);
  // Reset cloned hair transforms before the bot's character style is applied; prevents prior bot selections leaking into the next round.
  for(const k of ['back','backL','backR','sideL','sideR','crownL','crownR','fringeL','fringeR'])if(hp[k]){hp[k].scale.set(1,1,1);hp[k].rotation.z=0}
+ if(hp.crownL)hp.crownL.visible=l.hairStyle!=='close';if(hp.crownR)hp.crownR.visible=l.hairStyle!=='close';
 if(hp.cap)hp.cap.scale.set(l.hairStyle==='close'?.90:.97,l.hairStyle==='close'?.36:.76,l.hairStyle==='close'?.92:.98);if(hp.top){hp.top.visible=l.hairStyle!=='close';hp.top.scale.set(l.hairStyle==='long'?1.16:(l.hairStyle==='sides'?1.06:1),l.hairStyle==='long'?.72:.55,l.hairStyle==='long'?1.06:.95)}if(hp.back)hp.back.visible=l.hairStyle==='long';if(hp.backL)hp.backL.visible=l.hairStyle==='long';if(hp.backR)hp.backR.visible=l.hairStyle==='long';if(hp.sideL)hp.sideL.visible=l.hairStyle==='sides'||l.hairStyle==='long';if(hp.sideR)hp.sideR.visible=l.hairStyle==='sides'||l.hairStyle==='long';if(hp.fringeL){hp.fringeL.visible=l.hairStyle!=='close';hp.fringeL.scale.y=l.hairStyle==='long'?1.35:1}if(hp.fringeR){hp.fringeR.visible=l.hairStyle!=='close';hp.fringeR.scale.y=l.hairStyle==='long'?1.35:1}
 }
 function chooseBotCharacter(){const choices=charNames.filter(n=>n!==selectedCharacter);applyBotCharacter(choices[Math.floor(Math.random()*choices.length)]);}
