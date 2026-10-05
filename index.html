@@ -67,7 +67,9 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0d1117;col
 try{
  const THREE=await import("./vendor/three.module.min.js");
  const canvas=document.getElementById('game');
- const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio||1,2)); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ const MAX_RENDER_W=1920,MAX_RENDER_H=1080;
+ function targetPixelRatio(){const dpr=Math.max(1,devicePixelRatio||1),w=Math.max(1,innerWidth),h=Math.max(1,innerHeight);return Math.min(dpr,2,MAX_RENDER_W/w,MAX_RENDER_H/h)}
  const scene=new THREE.Scene(); scene.background=new THREE.Color(0x8fa7b5); scene.fog=new THREE.Fog(0x8fa7b5,45,115);
  const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,200);
  scene.add(new THREE.HemisphereLight(0xdbeeff,0x42503d,2.1)); const sun=new THREE.DirectionalLight(0xffffff,2.3);sun.position.set(-18,28,10);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;scene.add(sun);
@@ -580,7 +582,7 @@ canvas.addEventListener('pointermove',e=>{
 });
 function endLook(e){if(e.pointerId===lookPointer)lookPointer=null}
 canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercancel',endLook);canvas.addEventListener('lostpointercapture',endLook);
- function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
+ function resize(){renderer.setPixelRatio(targetPixelRatio());renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
   // Mobile lifecycle safety: never leave movement/look inputs latched after the app loses focus.
   function releaseInputs(){Object.keys(keys).forEach(k=>keys[k]=false);state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;lookPointer=null;jid=null;sprintBtn.classList.remove('active','auto');slideBtn.classList.remove('active');knob.style.transform='';}
   addEventListener('blur',releaseInputs);document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseInputs()});
