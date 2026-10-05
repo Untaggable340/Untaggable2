@@ -108,8 +108,8 @@ concreteBlock(-36,8,3.5,18,6.2);concreteBlock(36,8,3.5,18,6.2);
 const recessMat=new THREE.MeshStandardMaterial({color:0x343735,roughness:1});
 for(const x of [-24,-8,8,24]){const r=new THREE.Mesh(new THREE.BoxGeometry(3.0,2.8,.16),recessMat);r.position.set(x,1.42,58.72);scene.add(r)}
 // Low angular route pieces make the central floor useful for chase cuts instead of decoration only.
-concreteBlock(-9,7,5,2.4,.55);concreteBlock(9,7,5,2.4,.55);
-concreteBlock(-12,1,3.5,5,1.05);concreteBlock(12,1,3.5,5,1.05);
+concreteBlock(-9,7,5,2.4,.55,0,true);concreteBlock(9,7,5,2.4,.55,0,true);
+concreteBlock(-12,1,3.5,5,1.05,0,true);concreteBlock(12,1,3.5,5,1.05,0,true);
 // Concrete wear language: darker base bands, cap slabs and sparse floor patches add depth without external assets.
 const wearMat=new THREE.MeshStandardMaterial({color:0x969690,roughness:1});
 const capMat=new THREE.MeshStandardMaterial({color:0xc9c8c1,roughness:.94});
@@ -126,12 +126,12 @@ const bridge=new THREE.Mesh(new THREE.BoxGeometry(12,.38,2.6),bridgeMat);bridge.
 for(const x of [-5.5,5.5]){const support=new THREE.Mesh(new THREE.BoxGeometry(.65,3.8,.65),concreteDark);support.position.set(x,1.9,45);support.castShadow=true;scene.add(support)}
 // Parkour route pass: readable ascending side routes, vault blocks and landing pads.
 for(let i=0;i<4;i++){concreteBlock(-38+i*2.2,-45+i*4.2,3.6,3.6,.65+i*.48);concreteBlock(38-i*2.2,-42+i*4.2,3.6,3.6,.65+i*.48)}
-concreteBlock(-26,-12,5.5,1.3,.82);concreteBlock(-20,-16,5.5,1.3,1.12);concreteBlock(-14,-20,5.5,1.3,1.42);
-concreteBlock(26,-10,5.5,1.3,.82);concreteBlock(20,-14,5.5,1.3,1.12);concreteBlock(14,-18,5.5,1.3,1.42);
+concreteBlock(-26,-12,5.5,1.3,.82,0,true);concreteBlock(-20,-16,5.5,1.3,1.12,0,true);concreteBlock(-14,-20,5.5,1.3,1.42,0,true);
+concreteBlock(26,-10,5.5,1.3,.82,0,true);concreteBlock(20,-14,5.5,1.3,1.12,0,true);concreteBlock(14,-18,5.5,1.3,1.42,0,true);
 detailSlab(-17,-27,8,5,.22,capMat,2.25);detailSlab(17,-25,8,5,.22,capMat,2.25);
 // Central cover cluster adds quick direction changes and line-of-sight breaks for tag chases.
-concreteBlock(-5,27,2.4,6,1.35);concreteBlock(5,27,2.4,6,1.35);
-concreteBlock(0,33,7,2.2,.78);
+concreteBlock(-5,27,2.4,6,1.35,0,true);concreteBlock(5,27,2.4,6,1.35,0,true);
+concreteBlock(0,33,7,2.2,.78,0,true);
 concreteBlock(-8,36,3,3,1.75);concreteBlock(8,36,3,3,1.75);
 // Narrow elevated rails visually connect the arena's vertical routes.
 detailSlab(-13,42,10,1.1,.24,capMat,2.62);detailSlab(13,42,10,1.1,.24,capMat,2.62);
@@ -154,7 +154,7 @@ concreteBlock(-40,47,4,14,4.2);concreteBlock(40,47,4,14,4.2);
 concreteBlock(-35,56,10,3,2.8);concreteBlock(35,56,10,3,2.8);
 detailSlab(-18,56.2,18,2,.26,capMat,3.05);detailSlab(18,56.2,18,2,.26,capMat,3.05);
 // Small staggered blocks provide emergency jukes near the central dais.
-concreteBlock(-7,13,2.2,2.2,.62);concreteBlock(7,13,2.2,2.2,.62);
+concreteBlock(-7,13,2.2,2.2,.62,0,true);concreteBlock(7,13,2.2,2.2,.62,0,true);
 concreteBlock(-10,20,2.4,2.4,.88,0,true);concreteBlock(10,20,2.4,2.4,.88,0,true);
 // Mobile performance pass: merge static visual detail intent through conservative shadow settings.
 const arenaStaticMeshes=[];
