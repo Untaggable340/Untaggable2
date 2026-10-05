@@ -57,7 +57,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0d1117;col
 <div id="characterSelect"><div class="charPanel"><div class="menuKicker">CHOOSE YOUR RUNNER</div><h2 id="previewName">FINN</h2><p id="previewTag">BALANCED PARKOUR RUNNER</p><div class="charNav"><button id="prevCharacter">←</button><button id="nextCharacter">→</button></div><button id="confirmCharacter" class="charConfirm">SELECT FINN</button></div><div class="charPreview"><div id="previewPerson" class="previewPerson"><div class="pvHead"></div><div class="pvHair"></div><div class="pvBody"></div><div class="pvArm l"></div><div class="pvArm r"></div><div class="pvLeg l"></div><div class="pvLeg r"></div><div class="pvShoe l"></div><div class="pvShoe r"></div></div></div></div><div id="tutorial"><div id="tutorialCard"><button id="tutorialBack" class="tutorialBack" aria-label="Back to main menu">←</button><h2>HOW TO PLAY</h2><div class="tutorialGrid"><div class="tutorialItem"><b>MOVE</b>Use the left joystick. Push farther for stronger movement.</div><div class="tutorialItem"><b>LOOK</b>Drag the right side of the screen to look around.</div><div class="tutorialItem"><b>SPRINT</b>Hold Sprint while moving. Double-tap Sprint to toggle Auto Sprint.</div><div class="tutorialItem"><b>JUMP</b>Tap Jump to clear gaps and low obstacles.</div><div class="tutorialItem"><b>PARKOUR</b>Use Parkour at obstacles to vault or mantle. Jump + Parkour reaches taller ledges.</div><div class="tutorialItem"><b>SLIDE / CROUCH</b>Use Slide while moving to get low and pass under low structures.</div><div class="tutorialItem"><b>STAMINA</b>Sprinting, jumping and parkour use stamina. Ease off to regenerate it.</div><div class="tutorialItem"><b>PAUSE</b>Tap Ⅱ at any moment—even during a sprint—to freeze the match.</div></div></div></div><div id="pauseMenu"><div id="pauseCard"><h2>PAUSED</h2><button class="pauseAction" id="resumeGame">RESUME</button><button class="pauseAction" id="restartGame">RESTART MATCH</button><button class="pauseAction" id="mainMenuBtn">MAIN MENU</button></div></div>
 <div id="hud">
  <div id="top"><div><div id="role">RUNNER • 3D TEST</div><div id="stamWrap"><div id="stam"></div></div><div class="small">TRAINING GROUNDS • SKILL PARKOUR</div></div><div class="hint">Low obstacle: JUMP or PARKOUR<br>Medium obstacle: PARKOUR<br>Tall ledge: JUMP + PARKOUR</div></div>
- <div id="roundInfo">ROUND 1/1 • 0:45</div><button id="pauseBtn" aria-label="Pause game">Ⅱ</button><div id="toast"></div><div id="crosshair"></div><div id="lookHint">DRAG HERE TO LOOK ↔</div>
+ <div id="roundInfo">ROUND 1/1 • 1:00</div><button id="pauseBtn" aria-label="Pause game">Ⅱ</button><div id="toast"></div><div id="crosshair"></div><div id="lookHint">DRAG HERE TO LOOK ↔</div>
  <div id="joy"><div id="knob"></div></div>
  <div id="buttons"><div class="action" id="sprint"><span class="icon">»</span><span class="word">SPRINT</span></div><div class="action" id="parkour"><span class="icon">↗</span><span class="word">PARKOUR</span></div><div class="action" id="slide"><span class="icon">▱</span><span class="word">SLIDE</span></div><div class="action" id="jump"><span class="icon">↥</span><span class="word">JUMP</span></div></div>
 </div>
@@ -140,6 +140,7 @@ const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,act
 let game={started:false,totalRounds:1,round:1,time:60,between:false,paused:false,offlineBot:true};
 let cameraHeading=Math.PI,movementHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
 function resetRound(){
+ Object.keys(keys).forEach(k=>keys[k]=false);
  runner.position.set(0,0,10);state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.sprint=false;state.autoSprint=false;state.joyX=0;state.joyY=0;sprintBtn?.classList.remove('auto','active');knob&&(knob.style.transform='');
  bot.position.set(0,0,17);chooseBotCharacter();botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;botState.actionCooldown=0;botState.slideTimer=0;botState.parkourTimer=0;if(botLegL)botLegL.rotation.x=0;if(botLegR)botLegR.rotation.x=0;if(botArmL)botArmL.rotation.x=0;if(botArmR)botArmR.rotation.x=0;if(botTorso)botTorso.rotation.x=0;
  botState.headStart=5;botState.headStartDone=false;game.time=60;game.between=false;cameraHeading=state.facing;movementHeading=state.facing;cameraPitch=.05;
@@ -171,7 +172,7 @@ const tutorial=document.getElementById('tutorial');document.getElementById('tuto
 function setPaused(v){
  if(!game.offlineBot||!game.started)return;
  game.paused=v;pauseMenu.style.display=v?'flex':'none';
- if(v){state.sprint=false;state.autoSprint=false;state.slide=false;state.crouch=false;state.slideTimer=0;state.joyX=state.joyY=0;lookPointer=null;sprintBtn?.classList.remove('active','auto');knob&&(knob.style.transform='');}
+ if(v){Object.keys(keys).forEach(k=>keys[k]=false);state.sprint=false;state.autoSprint=false;state.slide=false;state.crouch=false;state.slideTimer=0;state.joyX=state.joyY=0;lookPointer=null;sprintBtn?.classList.remove('active','auto');knob&&(knob.style.transform='');}
 }
 pauseBtn.addEventListener('click',()=>setPaused(true));
 document.getElementById('resumeGame').addEventListener('click',()=>setPaused(false));
@@ -246,6 +247,7 @@ function blocked(nx,nz){
  function hold(id,key){const el=document.getElementById(id);el.addEventListener('pointerdown',e=>{state[key]=true;el.classList.add('active');el.setPointerCapture(e.pointerId)});const up=()=>{state[key]=false;el.classList.remove('active')};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)}
 const sprintBtn=document.getElementById('sprint');
 sprintBtn.addEventListener('pointerdown',e=>{
+ if(!game.started||game.paused||game.between)return;
  const now=performance.now();
  if(state.autoSprint){
    state.autoSprint=false;state.sprint=false;state.lastSprintTap=0;
@@ -261,7 +263,7 @@ sprintBtn.addEventListener('pointerdown',e=>{
 const sprintRelease=()=>{state.sprint=false;sprintBtn.classList.remove('active')};
 sprintBtn.addEventListener('pointerup',sprintRelease);sprintBtn.addEventListener('pointercancel',sprintRelease);
 const slideBtn=document.getElementById('slide');
-slideBtn.addEventListener('pointerdown',e=>{state.crouch=true;state.slide=true;state.slideTimer=(state.sprint||state.autoSprint)?0.78:0;slideBtn.classList.add('active');slideBtn.setPointerCapture(e.pointerId)});
+slideBtn.addEventListener('pointerdown',e=>{if(!game.started||game.paused||game.between)return;state.crouch=true;state.slide=true;state.slideTimer=(state.sprint||state.autoSprint)?0.78:0;slideBtn.classList.add('active');slideBtn.setPointerCapture(e.pointerId)});
 const slideUp=()=>{state.crouch=false;if(state.slideTimer<=0)state.slide=false;slideBtn.classList.remove('active')};slideBtn.addEventListener('pointerup',slideUp);slideBtn.addEventListener('pointercancel',slideUp);
 document.getElementById('jump').addEventListener('pointerdown',jump);document.getElementById('parkour').addEventListener('pointerdown',parkour);
  function botInside(o,x,z,pad=0){return x>o.x-o.w/2-pad&&x<o.x+o.w/2+pad&&z>o.z-o.d/2-pad&&z<o.z+o.d/2+pad}
@@ -358,7 +360,7 @@ document.getElementById('jump').addEventListener('pointerdown',jump);document.ge
  }
  // Right-side free-look: ignore touches that begin on action buttons or joystick.
 canvas.addEventListener('pointerdown',e=>{
- if(e.clientX<innerWidth*.45||!game.started)return;
+ if(e.clientX<innerWidth*.45||!game.started||game.paused||game.between)return;
  lookPointer=e.pointerId;lookLastX=e.clientX;lookLastY=e.clientY;canvas.setPointerCapture(e.pointerId);
 });
 canvas.addEventListener('pointermove',e=>{
