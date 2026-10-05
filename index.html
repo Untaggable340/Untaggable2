@@ -360,7 +360,7 @@ document.getElementById('jump').addEventListener('pointerdown',jump);document.ge
    botState.facing+=dAng*Math.min(1,10*dt);bot.rotation.y=botState.facing;
 
    const obstacle=botFrontObstacle(1.35);
-   if(obstacle&&botState.actionCooldown<=0){
+   if(obstacle&&botState.actionCooldown<=0&&botState.onGround){
      if(obstacle.h<=1.0){
        botState.yVel=4.8;botState.onGround=false;botState.support=null;botState.parkourTimer=.32;botState.actionCooldown=.5;
      }else if(obstacle.h<=1.65){
