@@ -5,13 +5,15 @@ on:
     branches: [main]
 jobs:
   build:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install
+          cache: npm
+      - run: npm ci
       - run: node scripts/prepare-android.mjs
       - run: npx cap add android
       - run: npx cap sync android
@@ -19,9 +21,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+          cache: gradle
       - name: Build debug APK
         working-directory: android
-        run: chmod +x gradlew && ./gradlew assembleDebug
+        timeout-minutes: 10
+        run: chmod +x gradlew && ./gradlew --no-daemon --stacktrace assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: Untaggable-debug-apk
