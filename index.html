@@ -472,6 +472,9 @@ canvas.addEventListener('pointermove',e=>{
 function endLook(e){if(e.pointerId===lookPointer)lookPointer=null}
 canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercancel',endLook);
  function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
+  // Mobile lifecycle safety: never leave movement/look inputs latched after the app loses focus.
+  function releaseInputs(){Object.keys(keys).forEach(k=>keys[k]=false);state.joyX=state.joyY=0;state.sprint=false;state.crouch=false;state.slide=false;state.slideTimer=0;lookPointer=null;jid=null;sprintBtn.classList.remove('active');slideBtn.classList.remove('active');knob.style.transform='';}
+  addEventListener('blur',releaseInputs);document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseInputs()});
  function loop(now){requestAnimationFrame(loop);let dt=Math.min((now-last)/1000,.033);last=now;
    if(game.started&&!game.between&&!game.paused&&botState.headStartDone){
      game.time=Math.max(0,game.time-dt);
