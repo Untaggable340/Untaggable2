@@ -270,7 +270,7 @@ document.getElementById('restartGame').addEventListener('click',()=>{
  game.paused=false;game.between=false;pauseMenu.style.display='none';game.round=1;resetRound();
 });
 document.getElementById('mainMenuBtn').addEventListener('click',()=>{if(roundTransitionTimer!==null){clearTimeout(roundTransitionTimer);roundTransitionTimer=null;}
- game.paused=false;game.started=false;game.between=false;state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.crouch=false;state.slide=false;sprintBtn?.classList.remove('auto','active');pauseMenu.style.display='none';pauseBtn.style.display='none';
+ game.paused=false;game.started=false;game.between=false;state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.crouch=false;state.slide=false;state.slideTimer=0;lookPointer=null;jid=null;sprintBtn?.classList.remove('auto','active');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');pauseMenu.style.display='none';pauseBtn.style.display='none';
  document.getElementById('menu').style.display='flex';game.round=1;game.time=60;
 });
 document.getElementById('startGame').addEventListener('click',()=>{
