@@ -546,7 +546,7 @@ parkourBtn.addEventListener('pointerdown',e=>{if(!e.isPrimary&&e.pointerType==='
    if(!botState.onGround){
      const oldY=bot.position.y;botState.yVel-=17.5*dt;let newY=oldY+botState.yVel*dt,best=-1,sup=null;
      if(botState.yVel<=0){
-       for(const o of obstacles)if(botInside(o,bot.position.x,bot.position.z,.28)&&oldY>=o.h-.20&&newY<=o.h+.28&&o.h>best){best=o.h;sup=o}
+       for(const o of obstacles)if(botInside(o,bot.position.x,bot.position.z,.28)&&oldY>=o.h-.20&&newY<=o.h+.28&&o.h<=oldY+.28&&o.h>best){best=o.h;sup=o}
      }
      if(sup){bot.position.y=best;botState.yVel=0;botState.onGround=true;botState.support=sup}
      else{bot.position.y=newY;if(bot.position.y<=0){bot.position.y=0;botState.yVel=0;botState.onGround=true;botState.support=null}}
