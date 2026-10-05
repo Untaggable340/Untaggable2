@@ -156,6 +156,10 @@ detailSlab(-18,56.2,18,2,.26,capMat,3.05);detailSlab(18,56.2,18,2,.26,capMat,3.0
 // Small staggered blocks provide emergency jukes near the central dais.
 concreteBlock(-7,13,2.2,2.2,.62);concreteBlock(7,13,2.2,2.2,.62);
 concreteBlock(-10,20,2.4,2.4,.88);concreteBlock(10,20,2.4,2.4,.88);
+// Mobile performance pass: merge static visual detail intent through conservative shadow settings.
+const arenaStaticMeshes=[];
+scene.traverse(o=>{if(o.isMesh&&o!==runner&&!o.userData.skinRole){if(o.geometry&&o.geometry.type==='BoxGeometry'&&o.position.y>3.2){o.castShadow=false}if(o.material===wearMat||o.material===edgeMat||o.material===capMat){o.castShadow=false}arenaStaticMeshes.push(o)}});
+// Keep high-value near-ground shadows while reducing expensive shadow casters in dense upper architecture.
 
 // Thin dark strips visually mark ledge lips so jumps remain readable on small mobile screens.
 for(const x of [-26,-20,-14,14,20,26]){const lip=new THREE.Mesh(new THREE.BoxGeometry(5.3,.045,.10),concreteDark);lip.position.set(x,x<0?(.02*x-.15):(.02*x-.43),-0.0);lip.visible=false;scene.add(lip)}
