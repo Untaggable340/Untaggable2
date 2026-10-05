@@ -117,6 +117,13 @@ function detailSlab(x,z,w,d,h,mat,y){const m=new THREE.Mesh(new THREE.BoxGeometr
 detailSlab(0,58.7,86,.18,.55,wearMat,.28);detailSlab(-43.35,-10,.18,136,.65,wearMat,.32);detailSlab(43.35,-10,.18,136,.65,wearMat,.32);
 for(const x of [-30,-10,10,30]) detailSlab(x,58.45,4.2,.34,.18,capMat,3.22);
 for(const p of [[-22,20,5,3],[22,27,4,6],[-5,38,7,3],[13,43,5,4]]){const m=detailSlab(p[0],p[1],p[2],p[3],.018,wearMat,.02);m.rotation.y=.12*(p[0]>0?1:-1)}
+// Arena landmark pass: asymmetric towers and overhead bridges improve navigation and reference-like vertical depth.
+concreteBlock(-31,-29,8,10,7.2);concreteBlock(31,-24,8,12,6.6);
+concreteBlock(-23,-32,10,3,3.1);concreteBlock(23,-29,10,3,2.7);
+detailSlab(-27,-28,13,2.2,.34,capMat,4.9);detailSlab(27,-25,13,2.2,.34,capMat,4.55);
+const bridgeMat=new THREE.MeshStandardMaterial({color:0xaeadA6,roughness:.96});
+const bridge=new THREE.Mesh(new THREE.BoxGeometry(12,.38,2.6),bridgeMat);bridge.position.set(0,3.75,45);bridge.castShadow=true;bridge.receiveShadow=true;scene.add(bridge);
+for(const x of [-5.5,5.5]){const support=new THREE.Mesh(new THREE.BoxGeometry(.65,3.8,.65),concreteDark);support.position.set(x,1.9,45);support.castShadow=true;scene.add(support)}
 
 
  function box(x,z,w,d,h,color=0x8a7f70,label=''){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,roughness:.85}));m.position.set(x,h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);obstacles.push({mesh:m,x,z,w,d,h,label,climbOnly:label==='CLIMB ONLY'});return m}
