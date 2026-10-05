@@ -130,7 +130,8 @@ function applyBotCharacter(name){
  });
  bot.scale.set(...l.scale);
  const parts=[];bot.traverse(o=>{if(o.isMesh)parts.push(o)});
- const hairParts=parts.filter(o=>o.userData.skinRole==='hair');if(hairParts[1])hairParts[1].visible=l.hairStyle==='long';if(hairParts[2])hairParts[2].visible=l.hairStyle==='sides';if(hairParts[3])hairParts[3].visible=l.hairStyle==='sides';
+ const bt=botPartOf(torso),bc=botPartOf(chest),bp=botPartOf(pelvis);if(bt)bt.scale.set(1.08*l.build[0],l.build[1],.72*l.build[2]);if(bc)bc.scale.set(1.08*l.build[0],.72*l.build[1],.68*l.build[2]);if(bp)bp.scale.x=l.build[0];
+ const hairParts=parts.filter(o=>o.userData.skinRole==='hair');if(hairParts[0])hairParts[0].scale.set(l.hairStyle==='close'?.88:.95,l.hairStyle==='close'?.42:.72,l.hairStyle==='close'?.90:.96);if(hairParts[1])hairParts[1].visible=l.hairStyle==='long';if(hairParts[2])hairParts[2].visible=l.hairStyle==='sides';if(hairParts[3])hairParts[3].visible=l.hairStyle==='sides';
 }
 function chooseBotCharacter(){const choices=charNames.filter(n=>n!==selectedCharacter);applyBotCharacter(choices[Math.floor(Math.random()*choices.length)]);}
 const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,actionCooldown:0,slideTimer:0,parkourTimer:0,headStart:5,headStartDone:false};
@@ -475,11 +476,9 @@ canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercan
    head.position.y=1.98+(moving&&!air?Math.abs(Math.sin(phase*2))*.018:0);
    if(air){torso.rotation.x=state.yVel>0?-.10:.12;shoulders.rotation.x=state.yVel>0?-.08:.10;}
    else shoulders.rotation.x=0;
-   if(crouching){runner.scale.y=.72;torso.rotation.x=.18;legL.rotation.x=.42;legR.rotation.x=.42;armL.rotation.x=-.28;armR.rotation.x=-.28;}
-   else if(sliding){runner.scale.y=.62;torso.rotation.x=.55;torso.rotation.z=.08;legL.rotation.x=1.0;legR.rotation.x=.62;armL.rotation.x=-.58;armR.rotation.x=-.30;}
-   else runner.scale.y=characterLooks[selectedCharacter].scale[1];
-   if(crouching)runner.scale.y=characterLooks[selectedCharacter].scale[1]*.72;
-   else if(sliding)runner.scale.y=characterLooks[selectedCharacter].scale[1]*.62;
+   if(crouching){torso.rotation.x=.18;legL.rotation.x=.42;legR.rotation.x=.42;armL.rotation.x=-.28;armR.rotation.x=-.28;}
+   else if(sliding){torso.rotation.x=.55;torso.rotation.z=.08;legL.rotation.x=1.0;legR.rotation.x=.62;armL.rotation.x=-.58;armR.rotation.x=-.30;}
+   runner.scale.y=characterLooks[selectedCharacter].scale[1]*(crouching?.72:(sliding?.62:1));
    if(state.parkourTimer>0){torso.rotation.x=-.18;armL.rotation.x=-1.15;armR.rotation.x=-1.15;legL.rotation.x=.55;legR.rotation.x=-.18;}
    updateBot(dt,now);
    // Free-look camera: right-thumb camera movement does not directly steer the runner.
