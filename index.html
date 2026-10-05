@@ -103,6 +103,8 @@ try{
  const neck=new THREE.Mesh(new THREE.CylinderGeometry(.11,.12,.18,10),skin);neck.position.y=1.72;runner.add(neck);
  const head=new THREE.Mesh(new THREE.SphereGeometry(.285,24,18),skin);head.scale.set(.92,1.08,.94);head.position.y=1.98;head.castShadow=true;runner.add(head);
  const hair=new THREE.Mesh(new THREE.SphereGeometry(.292,16,10,0,Math.PI*2,0,Math.PI*.55),hairMat);hair.position.y=2.055;hair.scale.set(.95,.72,.96);runner.add(hair);
+ const hairTop=new THREE.Mesh(new THREE.SphereGeometry(.19,16,10),hairMat);hairTop.position.set(0,2.17,-.015);hairTop.scale.set(1.05,.55,.95);runner.add(hairTop);
+ const hairFringeL=new THREE.Mesh(new THREE.CapsuleGeometry(.045,.15,5,8),hairMat),hairFringeR=hairFringeL.clone();hairFringeL.position.set(-.10,2.12,.20);hairFringeR.position.set(.10,2.12,.20);hairFringeL.rotation.z=.35;hairFringeR.rotation.z=-.35;runner.add(hairFringeL,hairFringeR);
  const hairBack=new THREE.Mesh(new THREE.CapsuleGeometry(.12,.38,4,8),hairMat);hairBack.position.set(0,1.82,-.20);hairBack.visible=false;runner.add(hairBack);
  const hairSideL=new THREE.Mesh(new THREE.CapsuleGeometry(.07,.32,4,8),hairMat),hairSideR=hairSideL.clone();hairSideL.position.set(-.25,1.88,0);hairSideR.position.set(.25,1.88,0);hairSideL.visible=hairSideR.visible=false;runner.add(hairSideL,hairSideR);
  const faceMat=new THREE.MeshStandardMaterial({color:0x20252b,roughness:.75}),eyeGeo=new THREE.SphereGeometry(.032,12,8);
@@ -131,7 +133,7 @@ cargoPocketL.userData.skinRole='pants';cargoPocketR.userData.skinRole='pants';
  const shoeGeo=new THREE.BoxGeometry(.25,.17,.42),shoeL=new THREE.Mesh(shoeGeo,shoeMat),shoeR=shoeL.clone();legL.add(shoeL);legR.add(shoeR);shoeL.position.set(0,-.40,.07);shoeR.position.set(0,-.40,.07);
  const soleMat=new THREE.MeshStandardMaterial({color:0xe8e8e4,roughness:.88}),soleL=new THREE.Mesh(new THREE.BoxGeometry(.265,.045,.44),soleMat),soleR=soleL.clone();shoeL.add(soleL);shoeR.add(soleR);soleL.position.y=-.10;soleR.position.y=-.10;
  const laceMat=new THREE.MeshStandardMaterial({color:0xc9c9c5,roughness:.9}),laceL=new THREE.Mesh(new THREE.BoxGeometry(.14,.018,.17),laceMat),laceR=laceL.clone();shoeL.add(laceL);shoeR.add(laceR);laceL.position.set(0,.09,.035);laceR.position.set(0,.09,.035);
- [neck,head,armL,armR,handL,handR].forEach(m=>m.userData.skinRole='skin');[torso,chest,waist].forEach(m=>m.userData.skinRole='shirt');[pelvis,legL,legR].forEach(m=>m.userData.skinRole='pants');[hair,hairBack,hairSideL,hairSideR].forEach(m=>m.userData.skinRole='hair');[shoeL,shoeR].forEach(m=>m.userData.skinRole='shoe');
+ [neck,head,armL,armR,handL,handR].forEach(m=>m.userData.skinRole='skin');[torso,chest,waist].forEach(m=>m.userData.skinRole='shirt');[pelvis,legL,legR].forEach(m=>m.userData.skinRole='pants');[hair,hairTop,hairFringeL,hairFringeR,hairBack,hairSideL,hairSideR].forEach(m=>m.userData.skinRole='hair');[shoeL,shoeR].forEach(m=>m.userData.skinRole='shoe');
  runner.position.set(0,0,10);
 // Offline tagger uses the same human model as the four playable runners.
 const bot=runner.clone(true);scene.add(bot);bot.position.set(0,0,17);
