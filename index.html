@@ -116,6 +116,8 @@ try{
  const mouth=new THREE.Mesh(new THREE.BoxGeometry(.105,.014,.012),new THREE.MeshStandardMaterial({color:0x6b3c38,roughness:.85}));mouth.position.set(0,1.875,.294);runner.add(mouth);
  const jaw=new THREE.Mesh(new THREE.SphereGeometry(.235,18,12),skin);jaw.scale.set(.88,.52,.82);jaw.position.set(0,1.84,.015);runner.add(jaw);jaw.userData.skinRole='skin';
  const cheekGeo=new THREE.SphereGeometry(.075,12,8),cheekL=new THREE.Mesh(cheekGeo,skin),cheekR=cheekL.clone();cheekL.scale.set(1,.55,.42);cheekR.scale.copy(cheekL.scale);cheekL.position.set(-.145,1.93,.245);cheekR.position.set(.145,1.93,.245);runner.add(cheekL,cheekR);cheekL.userData.skinRole='skin';cheekR.userData.skinRole='skin';
+ const chin=new THREE.Mesh(new THREE.SphereGeometry(.09,12,8),skin);chin.scale.set(1,.48,.60);chin.position.set(0,1.805,.22);runner.add(chin);chin.userData.skinRole='skin';
+ const neckShadow=new THREE.Mesh(new THREE.CylinderGeometry(.125,.14,.08,12),skin);neckShadow.position.y=1.66;runner.add(neckShadow);neckShadow.userData.skinRole='skin';
  const earGeo=new THREE.SphereGeometry(.045,10,8),earL=new THREE.Mesh(earGeo,skin),earR=earL.clone();earL.scale.x=.55;earR.scale.x=.55;earL.position.set(-.276,1.99,0);earR.position.set(.276,1.99,0);runner.add(earL,earR);
  const pelvis=new THREE.Mesh(new THREE.BoxGeometry(.55,.24,.34),pants);pelvis.position.y=.82;runner.add(pelvis);
  const belt=new THREE.Mesh(new THREE.BoxGeometry(.57,.075,.355),new THREE.MeshStandardMaterial({color:0x171b20,roughness:.9}));belt.position.y=.91;runner.add(belt);belt.userData.skinRole='pants';
@@ -136,6 +138,7 @@ const shirtSleeveGeo=new THREE.CylinderGeometry(.145,.135,.20,14),shirtSleeveL=n
  const wristMat=new THREE.MeshStandardMaterial({color:0x1b2025,roughness:.8}),wristBandL=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.055,12),wristMat),wristBandR=wristBandL.clone();armL.add(wristBandL);armR.add(wristBandR);wristBandL.position.y=-.28;wristBandR.position.y=-.28;
  const pantCuffGeo=new THREE.CylinderGeometry(.17,.145,.16,14),pantCuffL=new THREE.Mesh(pantCuffGeo,pants),pantCuffR=pantCuffL.clone();
  pantCuffL.position.set(-.17,.19,0);pantCuffR.position.set(.17,.19,0);runner.add(pantCuffL,pantCuffR);pantCuffL.userData.skinRole='pants';pantCuffR.userData.skinRole='pants';
+ const kneeMat=pants.clone(),kneePanelL=new THREE.Mesh(new THREE.BoxGeometry(.23,.20,.045),kneeMat),kneePanelR=kneePanelL.clone();kneePanelL.position.set(-.17,.49,.155);kneePanelR.position.set(.17,.49,.155);runner.add(kneePanelL,kneePanelR);kneePanelL.userData.skinRole='pants';kneePanelR.userData.skinRole='pants';
  const cargoMat=pants.clone();
 const cargoPocketL=new THREE.Mesh(new THREE.BoxGeometry(.13,.18,.055),cargoMat),cargoPocketR=cargoPocketL.clone();
 cargoPocketL.position.set(-.17,.53,.16);cargoPocketR.position.set(.17,.53,.16);runner.add(cargoPocketL,cargoPocketR);
