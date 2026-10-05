@@ -240,7 +240,7 @@ function resetRound(){if(roundTransitionTimer!==null){clearTimeout(roundTransiti
 function finishRound(reason){
  if(game.between)return;game.between=true;
  game.paused=false;pauseMenu.style.display='none';pauseBtn.style.display='none';  toast(reason);
- if(game.round>=game.totalRounds){
+ if(game.round>=game.totalRounds){game.time=Math.max(0,game.time);
    roundTransitionTimer=setTimeout(()=>{roundTransitionTimer=null;game.started=false;state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.crouch=false;state.slide=false;sprintBtn?.classList.remove('active','auto');knob&&(knob.style.transform='');pauseBtn.style.display='none';document.getElementById('menu').style.display='flex';toast('MATCH COMPLETE');},900);
  }else{
    game.round++;
