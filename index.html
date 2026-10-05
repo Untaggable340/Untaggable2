@@ -1,1 +1,433 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Untaggable</title><link rel="stylesheet" href="styles.css"></head><body><div id="game"><canvas id="c"></canvas><div id="hud"><div class="brand">UNTAGGABLE <span id="modeLabel">OFFLINE • NORMAL TAG</span></div><div class="status"><span id="role">RUNNER • FINN</span><span id="timer">60</span></div><div class="stamina"><i id="staminaFill"></i></div><div id="survivors"></div></div><div id="menu"><h1>UNTAGGABLE</h1><p>OFFLINE TRAINING BUILD</p><div class="arenas"><span>ARENA</span><button data-arena="training" class="selected">TRAINING GROUNDS</button><button data-arena="yard">THE YARD</button><button data-arena="rooftops">ROOFTOPS</button></div><div class="choices"><button data-mode="normal">NORMAL TAG<small>1 RUNNER • 1 TAGGER</small></button><button data-mode="zombie">ZOMBIE TAG<small>YOU + 2 RUNNERS • 1 INFECTED</small></button></div><div class="characters"><span>CHARACTER</span><button data-char="Finn" class="selected">FINN</button><button data-char="Gwen">GWEN</button><button data-char="Trinity">TRINITY</button><button data-char="Owen">OWEN</button></div></div><div id="message"></div><button id="pause" aria-label="Pause game">Ⅱ</button><div id="pauseMenu" class="hidden"><div class="pauseCard"><h2>PAUSED</h2><button id="resumeGame">RESUME</button><button id="restartGame">RESTART</button><button id="mainMenu">MAIN MENU</button></div></div><div id="lookHint">DRAG HERE TO LOOK ↔</div><div id="leftPad"><div id="stick"></div></div><div id="actions"><button id="sprint"><b>⚡</b><small>SPRINT</small></button><button id="jump"><b>↑</b><small>JUMP</small></button><button id="parkour"><b>↗</b><small>PARKOUR</small></button><button id="slide"><b>▱</b><small>SLIDE</small></button></div></div><script type="module" src="src/game.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<title>Untaggable 3D v0.1</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0d1117;color:#fff;font-family:Arial,Helvetica,sans-serif;touch-action:none;user-select:none}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+#loading,#error{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;background:#0d1117;z-index:50;font-weight:800;line-height:1.45}
+#error{display:none;color:#ffd5d5}
+#hud{position:fixed;inset:0;pointer-events:none;z-index:10}
+#top{position:absolute;left:max(18px,env(safe-area-inset-left));right:max(18px,env(safe-area-inset-right));top:max(12px,env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:flex-start;text-shadow:0 2px 6px #000}
+#role{font-weight:900;font-size:19px;letter-spacing:.08em}.small{font-size:10px;opacity:.68;margin-top:5px}.hint{text-align:right;max-width:310px;font-size:11px;opacity:.7;line-height:1.35}
+#stamWrap{width:min(250px,30vw);height:10px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:99px;overflow:hidden;margin-top:6px}#stam{height:100%;width:100%;background:#f0f4f8;transition:width .08s linear}
+#roundInfo{position:absolute;left:50%;top:max(12px,env(safe-area-inset-top));transform:translateX(-50%);font-weight:900;font-size:17px;text-shadow:0 2px 6px #000;text-align:center}#toast{position:absolute;left:50%;top:18%;transform:translateX(-50%);font-size:22px;font-weight:900;text-shadow:0 3px 8px #000;opacity:0;transition:opacity .16s}
+#joy{pointer-events:auto;position:absolute;left:max(24px,env(safe-area-inset-left));bottom:max(20px,env(safe-area-inset-bottom));width:124px;height:124px;border-radius:50%;background:rgba(255,255,255,.11);border:2px solid rgba(255,255,255,.24)}
+#knob{position:absolute;width:54px;height:54px;left:33px;top:33px;border-radius:50%;background:rgba(255,255,255,.34);border:2px solid rgba(255,255,255,.45)}
+#buttons{pointer-events:auto;position:absolute;right:max(20px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));width:286px;height:180px}
+.action{position:absolute;width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;background:rgba(18,25,34,.72);border:2px solid rgba(255,255,255,.28);box-shadow:0 4px 14px rgba(0,0,0,.3);font-weight:900;color:#fff}
+.action .icon{font-size:27px;line-height:1}.action .word{font-size:8px;opacity:.62;margin-top:4px}.action.active{transform:scale(.92);background:rgba(255,255,255,.24)}
+#jump{right:82px;bottom:0}#parkour{right:0;bottom:78px}#slide{right:0;bottom:0}#sprint{right:168px;bottom:49px}
+#crosshair{position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2px;border-radius:50%;background:rgba(255,255,255,.5)}
+#rotate{display:none;position:fixed;inset:0;z-index:60;background:#0d1117;align-items:center;justify-content:center;text-align:center;padding:28px;font-weight:900}#rotate span{display:block;font-size:56px;margin-bottom:12px;transform:rotate(90deg)}
+@media(orientation:portrait) and (max-width:900px){#rotate{display:flex}}
+@media(max-height:500px){#buttons{transform:scale(.9);transform-origin:right bottom}#joy{transform:scale(.9);transform-origin:left bottom}.hint{display:none}}
+.btn.auto{background:rgba(255,255,255,.34)!important;border-color:rgba(255,255,255,.95)!important;box-shadow:0 0 16px rgba(255,255,255,.42),inset 0 0 12px rgba(255,255,255,.16)}
+#menu{position:fixed;inset:0;z-index:45;background:rgba(13,17,23,.94);display:flex;align-items:center;justify-content:center;pointer-events:auto}
+#menuCard{width:min(420px,82vw);text-align:center;padding:24px;border:1px solid rgba(255,255,255,.18);border-radius:18px;background:rgba(25,33,43,.96)}
+#menuCard h2{margin:0 0 8px;font-size:27px}#menuCard p{opacity:.72;font-size:13px;margin:0 0 18px}
+.roundChoices{display:flex;gap:10px;justify-content:center}.roundChoice{min-width:86px;padding:13px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-weight:900;font-size:15px}
+.roundChoice.selected{background:rgba(255,255,255,.26);border-color:#fff}#startGame{margin-top:18px;padding:13px 30px;border:0;border-radius:12px;font-weight:900;font-size:16px}
+#pauseBtn{pointer-events:auto;position:absolute;right:max(18px,env(safe-area-inset-right));top:52px;width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.3);background:rgba(13,17,23,.58);color:#fff;font-size:20px;font-weight:900;display:none}
+#pauseMenu{position:fixed;inset:0;z-index:46;background:rgba(7,10,14,.78);display:none;align-items:center;justify-content:center;pointer-events:auto}
+#pauseCard{width:min(330px,76vw);padding:22px;border-radius:18px;background:rgba(25,33,43,.97);border:1px solid rgba(255,255,255,.18);text-align:center}
+#pauseCard h2{margin:0 0 16px}.pauseAction{display:block;width:100%;margin:9px 0;padding:13px;border-radius:11px;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-weight:900}
+#resumeGame{background:rgba(255,255,255,.25)}
+#lookHint{position:absolute;right:22px;top:45%;font-size:10px;opacity:.5;text-align:right}
+</style>
+</head>
+<body>
+<div id="loading">BUILDING TRAINING GROUNDS…</div><div id="error">3D engine could not load. This prototype needs an internet connection the first time it opens.</div>
+<canvas id="game"></canvas>
+<div id="menu"><div id="menuCard"><h2>UNTAGGABLE</h2><p>Choose how many 45-second rounds to play.</p><div class="roundChoices"><button class="roundChoice selected" data-rounds="1">1 ROUND</button><button class="roundChoice" data-rounds="3">3 ROUNDS</button><button class="roundChoice" data-rounds="5">5 ROUNDS</button></div><button id="startGame">START GAME</button></div></div>
+<div id="pauseMenu"><div id="pauseCard"><h2>PAUSED</h2><button class="pauseAction" id="resumeGame">RESUME</button><button class="pauseAction" id="restartGame">RESTART MATCH</button><button class="pauseAction" id="mainMenuBtn">MAIN MENU</button></div></div>
+<div id="hud">
+ <div id="top"><div><div id="role">RUNNER • 3D TEST</div><div id="stamWrap"><div id="stam"></div></div><div class="small">TRAINING GROUNDS • SKILL PARKOUR</div></div><div class="hint">Low obstacle: JUMP or PARKOUR<br>Medium obstacle: PARKOUR<br>Tall ledge: JUMP + PARKOUR</div></div>
+ <div id="roundInfo">ROUND 1/1 • 0:45</div><button id="pauseBtn" aria-label="Pause game">Ⅱ</button><div id="toast"></div><div id="crosshair"></div><div id="lookHint">DRAG HERE TO LOOK ↔</div>
+ <div id="joy"><div id="knob"></div></div>
+ <div id="buttons"><div class="action" id="sprint"><span class="icon">»</span><span class="word">SPRINT</span></div><div class="action" id="parkour"><span class="icon">↗</span><span class="word">PARKOUR</span></div><div class="action" id="slide"><span class="icon">▱</span><span class="word">SLIDE</span></div><div class="action" id="jump"><span class="icon">↥</span><span class="word">JUMP</span></div></div>
+</div>
+<div id="rotate"><div><span>📱</span>TURN YOUR PHONE SIDEWAYS<br><small>Untaggable 3D is designed for landscape play.</small></div></div>
+<script type="module">
+(async()=>{
+try{
+ const THREE=await import('https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js');
+ const canvas=document.getElementById('game');
+ const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio||1,2)); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ const scene=new THREE.Scene(); scene.background=new THREE.Color(0x8fa7b5); scene.fog=new THREE.Fog(0x8fa7b5,45,115);
+ const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,200);
+ scene.add(new THREE.HemisphereLight(0xdbeeff,0x42503d,2.1)); const sun=new THREE.DirectionalLight(0xffffff,2.3);sun.position.set(-18,28,10);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;scene.add(sun);
+ const ground=new THREE.Mesh(new THREE.PlaneGeometry(90,120),new THREE.MeshStandardMaterial({color:0x68746d,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+ const grid=new THREE.GridHelper(90,30,0x48544f,0x718078);grid.position.y=.012;scene.add(grid);
+ const arenaHalfX=43.0,arenaMinZ=-58.0,arenaMaxZ=58.0,wallH=3.2,wallT=1.0;
+ const wallMat=new THREE.MeshStandardMaterial({color:0x4f5858,roughness:.95});
+ function arenaWall(x,z,w,d){const m=new THREE.Mesh(new THREE.BoxGeometry(w,wallH,d),wallMat);m.position.set(x,wallH/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m)}
+ arenaWall(-44,0,wallT,120);arenaWall(44,0,wallT,120);arenaWall(0,-59.5,88,wallT);arenaWall(0,59.5,88,wallT);
+ function clampArena(obj){obj.position.x=Math.max(-arenaHalfX,Math.min(arenaHalfX,obj.position.x));obj.position.z=Math.max(arenaMinZ,Math.min(arenaMaxZ,obj.position.z));}
+
+ const obstacles=[];
+ function box(x,z,w,d,h,color=0x8a7f70,label=''){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,roughness:.85}));m.position.set(x,h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);obstacles.push({mesh:m,x,z,w,d,h,label,climbOnly:label==='CLIMB ONLY'});return m}
+ // Height language: low .7-.95, medium 1.2-1.55, tall 2.0+
+ box(-6,-8,5,1.2,.75,0xa68b6c,'LOW'); box(5,-14,5,1.4,1.35,0x7c8994,'MEDIUM'); box(-4,-22,6,2,2.25,0x6f756f,'TALL');
+ box(10,-29,4,4,.85,0x9b856c,'LOW'); box(2,-36,8,2,1.5,0x75858d,'MEDIUM'); box(-10,-43,4,5,2.4,0x6d7479,'TALL');
+ box(12,-51,7,1.5,.8,0x9c8b72,'LOW'); box(-1,-58,4,4,1.35,0x7d8b90,'MEDIUM');
+ // CLIMB ONLY: these tops are deliberately above normal jump/vault reach.
+ box(8,-64,5,5,2.85,0x4f6878,'CLIMB ONLY'); box(-7,-72,6,5,3.15,0x4f6878,'CLIMB ONLY');
+ // side structures for depth cues
+ box(-19,-18,9,12,4.5,0x5d6467); box(20,-38,11,16,6,0x596168); box(-21,-58,10,14,5.2,0x626a6c);
+ const runner=new THREE.Group();scene.add(runner);
+ const shirt=new THREE.MeshStandardMaterial({color:0x26384b,roughness:.75}), skin=new THREE.MeshStandardMaterial({color:0xa9795f,roughness:.8}), pants=new THREE.MeshStandardMaterial({color:0x20252b,roughness:.9});
+ const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.36,.72,6,10),shirt);torso.position.y=1.15;torso.castShadow=true;runner.add(torso);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.29,16,12),skin);head.position.y=1.92;head.castShadow=true;runner.add(head);
+// Orientation details: the runner's local +Z direction is forward.
+const faceMat=new THREE.MeshStandardMaterial({color:0x20252b,roughness:.75});
+const eyeGeo=new THREE.SphereGeometry(.035,8,6);
+const eyeL=new THREE.Mesh(eyeGeo,faceMat);eyeL.position.set(-.095,1.97,.272);runner.add(eyeL);
+const eyeR=new THREE.Mesh(eyeGeo,faceMat);eyeR.position.set(.095,1.97,.272);runner.add(eyeR);
+const nose=new THREE.Mesh(new THREE.ConeGeometry(.035,.10,8),new THREE.MeshStandardMaterial({color:0xc48769,roughness:.8}));
+nose.rotation.x=Math.PI/2;nose.position.set(0,1.90,.305);runner.add(nose);
+// Small light front chest patch and darker back patch make direction readable at gameplay distance.
+const frontPatch=new THREE.Mesh(new THREE.BoxGeometry(.20,.28,.035),new THREE.MeshStandardMaterial({color:0xd8e2e8,roughness:.7}));
+frontPatch.position.set(0,1.20,.37);runner.add(frontPatch);
+const backPatch=new THREE.Mesh(new THREE.BoxGeometry(.25,.30,.035),new THREE.MeshStandardMaterial({color:0x17202a,roughness:.75}));
+backPatch.position.set(0,1.20,-.37);runner.add(backPatch);
+ const legL=new THREE.Mesh(new THREE.CapsuleGeometry(.12,.62,4,8),pants),legR=legL.clone();legL.position.set(-.18,.48,0);legR.position.set(.18,.48,0);runner.add(legL,legR);
+ runner.position.set(0,0,10);
+// First tagger bot — same simple body language as the runner, visually red so roles are obvious.
+const bot=new THREE.Group();scene.add(bot);
+const botShirt=new THREE.MeshStandardMaterial({color:0x7a2630,roughness:.75});
+const botSkin=new THREE.MeshStandardMaterial({color:0x9f7058,roughness:.8});
+const botPants=new THREE.MeshStandardMaterial({color:0x25272b,roughness:.9});
+const botTorso=new THREE.Mesh(new THREE.CapsuleGeometry(.36,.72,6,10),botShirt);botTorso.position.y=1.15;bot.add(botTorso);
+const botHead=new THREE.Mesh(new THREE.SphereGeometry(.29,16,12),botSkin);botHead.position.y=1.92;bot.add(botHead);
+const botLegL=new THREE.Mesh(new THREE.CapsuleGeometry(.12,.62,4,8),botPants),botLegR=botLegL.clone();
+botLegL.position.set(-.18,.48,0);botLegR.position.set(.18,.48,0);bot.add(botLegL,botLegR);
+const botFront=new THREE.Mesh(new THREE.BoxGeometry(.20,.28,.035),new THREE.MeshStandardMaterial({color:0xf0d7d7,roughness:.7}));
+botFront.position.set(0,1.20,.37);bot.add(botFront);
+bot.position.set(0,0,17);
+const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,actionCooldown:0,slideTimer:0,parkourTimer:0,headStart:5,headStartDone:false};
+ const state={vel:new THREE.Vector3(),yVel:0,onGround:true,stamina:150,sprint:false,slide:false,parkourBoost:0,parkourTimer:0,facing:Math.PI,joyX:0,joyY:0,support:null,autoSprint:false,lastSprintTap:0};
+ const keys={}; let last=performance.now();
+let game={started:false,totalRounds:1,round:1,time:45,between:false,paused:false,offlineBot:true};
+let cameraHeading=Math.PI,movementHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
+function resetRound(){
+ runner.position.set(0,0,10);state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;
+ bot.position.set(0,0,17);botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;
+ botState.headStart=5;botState.headStartDone=false;game.time=45;game.between=false;cameraHeading=state.facing;movementHeading=state.facing;cameraPitch=.05;
+}
+function finishRound(reason){
+ if(game.between)return;game.between=true;
+ toast(reason);
+ if(game.round>=game.totalRounds){
+   setTimeout(()=>{game.started=false;pauseBtn.style.display='none';document.getElementById('menu').style.display='flex';toast('MATCH COMPLETE');},900);
+ }else{
+   game.round++;
+   setTimeout(()=>resetRound(),900);
+ }
+}
+const roundInfo=document.getElementById('roundInfo');
+document.querySelectorAll('.roundChoice').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.roundChoice').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');game.totalRounds=Number(b.dataset.rounds);
+}));
+const pauseBtn=document.getElementById('pauseBtn'),pauseMenu=document.getElementById('pauseMenu');
+function setPaused(v){
+ if(!game.offlineBot||!game.started)return;
+ game.paused=v;pauseMenu.style.display=v?'flex':'none';
+}
+pauseBtn.addEventListener('click',()=>setPaused(true));
+document.getElementById('resumeGame').addEventListener('click',()=>setPaused(false));
+document.getElementById('restartGame').addEventListener('click',()=>{
+ game.paused=false;pauseMenu.style.display='none';game.round=1;resetRound();
+});
+document.getElementById('mainMenuBtn').addEventListener('click',()=>{
+ game.paused=false;game.started=false;game.between=false;pauseMenu.style.display='none';pauseBtn.style.display='none';
+ document.getElementById('menu').style.display='flex';game.round=1;game.time=45;
+});
+document.getElementById('startGame').addEventListener('click',()=>{
+ game.round=1;game.started=true;game.paused=false;document.getElementById('menu').style.display='none';
+ pauseBtn.style.display=game.offlineBot?'block':'none';resetRound();
+});
+
+ const toastEl=document.getElementById('toast');function toast(t){toastEl.textContent=t;toastEl.style.opacity=1;clearTimeout(toastEl._t);toastEl._t=setTimeout(()=>toastEl.style.opacity=0,650)}
+ function jump(){if(state.onGround&&state.stamina>=5){state.yVel=6.7;state.onGround=false;state.support=null;state.stamina-=5;toast('JUMP')}}
+ function parkour(){
+  if(state.stamina<8)return;
+  const hit=frontObstacle(1.45);
+  const sprinting=state.autoSprint||state.sprint||keys.shift;
+  // Airborne Jump + Parkour is the dedicated climb chain.
+  if(!state.onGround){
+    if(!hit){toast('NO LEDGE');return;}
+    const riseNeeded=hit.h-runner.position.y;
+    if(riseNeeded>3.35){toast('TOO HIGH');return;}
+    state.stamina-=10;
+    // Stronger upward pull than ordinary vault/mantle so climb-only routes are reachable.
+    state.yVel=Math.max(state.yVel,7.25);
+    state.parkourBoost=sprinting?8.2:6.4;
+    state.parkourTimer=.62;
+    state.support=null;
+    toast(hit.climbOnly?'CLIMB ROUTE!':'CLIMB!');
+    return;
+  }
+  if(!hit){toast('NO OBSTACLE');return;}
+  const h=hit.h;
+  if(hit.climbOnly){toast('JUMP + PARKOUR TO CLIMB');return;}
+  state.support=null;state.onGround=false;
+  if(h<=1.0){state.yVel=4.7;state.parkourBoost=sprinting?8.7:6.2;state.parkourTimer=.34;state.stamina-=7;toast('VAULT');}
+  else if(h<=1.65){state.yVel=6.0;state.parkourBoost=sprinting?8.0:5.5;state.parkourTimer=.44;state.stamina-=9;toast('MANTLE');}
+  else if(h<=2.35){state.yVel=6.4;state.parkourBoost=sprinting?7.2:4.8;state.parkourTimer=.50;state.stamina-=11;toast('CLIMB');}
+  else {state.onGround=true;toast('TOO HIGH — JUMP + PARKOUR');}
+ }
+ function frontObstacle(range){const f=new THREE.Vector3(Math.sin(state.facing),0,Math.cos(state.facing));let best=null,bd=999;for(const o of obstacles){const dx=Math.max(Math.abs(runner.position.x-o.x)-o.w/2,0),dz=Math.max(Math.abs(runner.position.z-o.z)-o.d/2,0);const d=Math.hypot(dx,dz);const to=new THREE.Vector3(o.x-runner.position.x,0,o.z-runner.position.z);if(to.lengthSq()>.001)to.normalize();if(d<range&&f.dot(to)>.35&&d<bd){best=o;bd=d}}return best}
+ function insideXZ(o,x,z,pad=0){return x>o.x-o.w/2-pad&&x<o.x+o.w/2+pad&&z>o.z-o.d/2-pad&&z<o.z+o.d/2+pad}
+function surfaceAt(x,z,currentY,descending){
+  let best=0,support=null;
+  for(const o of obstacles){
+    if(insideXZ(o,x,z,.18) && descending && currentY>=o.h-.22 && o.h>best){best=o.h;support=o}
+  }
+  return {y:best,support};
+}
+function blocked(nx,nz){
+  const radius=.30, feet=runner.position.y;
+  for(const o of obstacles){
+    if(!insideXZ(o,nx,nz,radius))continue;
+    // If our feet are already at/above the top, this is a walkable top surface, not a wall.
+    if(feet>=o.h-.18)continue;
+    // Parkour gives a brief pass-through only while rising over an edge.
+    if(state.parkourTimer>0 && feet+Math.max(state.yVel,0)*.12>=o.h-.12)continue;
+    return true;
+  }
+  return false;
+}
+ addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space')jump();if(e.key.toLowerCase()==='e')parkour()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+ const joy=document.getElementById('joy'),knob=document.getElementById('knob');let jid=null;function joySet(e){const r=joy.getBoundingClientRect();let x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2,m=Math.hypot(x,y),lim=43;if(m>lim){x*=lim/m;y*=lim/m}let nx=x/lim,ny=y/lim;const dead=.025,raw=Math.hypot(nx,ny);if(raw<dead){nx=0;ny=0}else{const scaled=Math.pow((raw-dead)/(1-dead),.82),s=scaled/raw;nx*=s;ny*=s}state.joyX=nx;state.joyY=ny;knob.style.transform=`translate(${x}px,${y}px)`}joy.addEventListener('pointerdown',e=>{jid=e.pointerId;joy.setPointerCapture(jid);joySet(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===jid)joySet(e)});function jend(e){if(e.pointerId===jid){jid=null;state.joyX=state.joyY=0;knob.style.transform=''}}joy.addEventListener('pointerup',jend);joy.addEventListener('pointercancel',jend);
+ function hold(id,key){const el=document.getElementById(id);el.addEventListener('pointerdown',e=>{state[key]=true;el.classList.add('active');el.setPointerCapture(e.pointerId)});const up=()=>{state[key]=false;el.classList.remove('active')};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)}
+const sprintBtn=document.getElementById('sprint');
+sprintBtn.addEventListener('pointerdown',e=>{
+ const now=performance.now();
+ if(state.autoSprint){
+   state.autoSprint=false;state.sprint=false;state.lastSprintTap=0;
+   sprintBtn.classList.remove('auto');toast('AUTO SPRINT OFF');return;
+ }
+ if(now-state.lastSprintTap<330){
+   state.autoSprint=true;state.sprint=false;state.lastSprintTap=0;
+   sprintBtn.classList.add('auto');toast('AUTO SPRINT ON');
+ }else{
+   state.sprint=true;state.lastSprintTap=now;sprintBtn.classList.add('active');
+ }
+});
+const sprintRelease=()=>{state.sprint=false;sprintBtn.classList.remove('active')};
+sprintBtn.addEventListener('pointerup',sprintRelease);sprintBtn.addEventListener('pointercancel',sprintRelease);
+hold('slide','slide');document.getElementById('jump').addEventListener('pointerdown',jump);document.getElementById('parkour').addEventListener('pointerdown',parkour);
+ function botInside(o,x,z,pad=0){return x>o.x-o.w/2-pad&&x<o.x+o.w/2+pad&&z>o.z-o.d/2-pad&&z<o.z+o.d/2+pad}
+ function botFrontObstacle(range=1.25){
+   const f=new THREE.Vector3(Math.sin(botState.facing),0,Math.cos(botState.facing));
+   let best=null,bd=999;
+   for(const o of obstacles){
+     const dx=Math.max(Math.abs(bot.position.x-o.x)-o.w/2,0),dz=Math.max(Math.abs(bot.position.z-o.z)-o.d/2,0);
+     const d=Math.hypot(dx,dz),to=new THREE.Vector3(o.x-bot.position.x,0,o.z-bot.position.z);
+     if(to.lengthSq()>.001)to.normalize();
+     if(d<range&&f.dot(to)>.28&&d<bd){best=o;bd=d}
+   }
+   return best;
+ }
+ function updateBot(dt,now){
+   if(!game.started||game.between||game.paused)return;
+   if(!botState.headStartDone){
+     botState.headStart=Math.max(0,botState.headStart-dt);
+     const n=Math.ceil(botState.headStart);
+     toast(n>0?'HEAD START: '+n:'GO!');
+     if(botState.headStart>0)return;
+     botState.headStartDone=true;
+   }
+   botState.actionCooldown=Math.max(0,botState.actionCooldown-dt);
+   botState.slideTimer=Math.max(0,botState.slideTimer-dt);
+   botState.parkourTimer=Math.max(0,botState.parkourTimer-dt);
+   const toPlayer=new THREE.Vector3(runner.position.x-bot.position.x,0,runner.position.z-bot.position.z);
+   const dist=toPlayer.length();
+   if(dist>.001)toPlayer.normalize();
+   const targetFacing=Math.atan2(toPlayer.x,toPlayer.z);
+   let dAng=Math.atan2(Math.sin(targetFacing-botState.facing),Math.cos(targetFacing-botState.facing));
+   botState.facing+=dAng*Math.min(1,10*dt);bot.rotation.y=botState.facing;
+
+   const obstacle=botFrontObstacle(1.35);
+   if(obstacle&&botState.actionCooldown<=0){
+     if(obstacle.h<=1.0){
+       botState.yVel=4.8;botState.onGround=false;botState.support=null;botState.parkourTimer=.32;botState.actionCooldown=.5;
+     }else if(obstacle.h<=1.65){
+       botState.yVel=6.0;botState.onGround=false;botState.support=null;botState.parkourTimer=.44;botState.actionCooldown=.6;
+     }else if(obstacle.h<=3.3){
+       // AI performs the same jump + climb concept on tall / climb-only routes.
+       botState.yVel=7.25;botState.onGround=false;botState.support=null;botState.parkourTimer=.62;botState.actionCooldown=.75;
+     }
+   }
+
+   const wantsSprint=dist>3.2&&botState.stamina>0;
+   let speed=wantsSprint?7.15:5.15; // just under the player's speeds
+   if(wantsSprint)botState.stamina=Math.max(0,botState.stamina-11*dt);
+   else botState.stamina=Math.min(150,botState.stamina+14*dt);
+   if(botState.parkourTimer>0)speed=Math.max(speed,6.8);
+
+   let move=toPlayer.clone();
+   // Basic local avoidance: sidestep when a wall is too high to clear immediately.
+   if(obstacle&&obstacle.h>3.3){
+     const side=new THREE.Vector3(move.z,0,-move.x);
+     const sign=((obstacle.x-bot.position.x)*side.x+(obstacle.z-bot.position.z)*side.z)>0?-1:1;
+     move.addScaledVector(side,sign*.85).normalize();
+   }
+   const bx=bot.position.x+move.x*speed*dt,bz=bot.position.z+move.z*speed*dt;
+   let blockedX=false,blockedZ=false;
+   for(const o of obstacles){
+     if(botInside(o,bx,bot.position.z,.30)&&bot.position.y<o.h-.16&&botState.parkourTimer<=0)blockedX=true;
+     if(botInside(o,bot.position.x,bz,.30)&&bot.position.y<o.h-.16&&botState.parkourTimer<=0)blockedZ=true;
+   }
+   if(!blockedX)bot.position.x=bx;if(!blockedZ)bot.position.z=bz;clampArena(bot);
+
+   if(!botState.onGround){
+     const oldY=bot.position.y;botState.yVel-=17.5*dt;let newY=oldY+botState.yVel*dt,best=-1,sup=null;
+     if(botState.yVel<=0){
+       for(const o of obstacles)if(botInside(o,bot.position.x,bot.position.z,.28)&&oldY>=o.h-.20&&newY<=o.h+.28&&o.h>best){best=o.h;sup=o}
+     }
+     if(sup){bot.position.y=best;botState.yVel=0;botState.onGround=true;botState.support=sup}
+     else{bot.position.y=newY;if(bot.position.y<=0){bot.position.y=0;botState.yVel=0;botState.onGround=true;botState.support=null}}
+   }else if(botState.support){
+     if(botInside(botState.support,bot.position.x,bot.position.z,.08))bot.position.y=botState.support.h;
+     else{botState.onGround=false;botState.support=null;botState.yVel=0}
+   }else bot.position.y=0;
+
+   const moving=dist>.8,phase=now*.012*(wantsSprint?1.35:1);
+   botLegL.rotation.x=moving?Math.sin(phase)*.55:0;botLegR.rotation.x=moving?-Math.sin(phase)*.55:0;
+
+   // A simple tag event for this prototype; reset the bot behind you so testing can continue.
+   if(dist<.78&&Math.abs(bot.position.y-runner.position.y)<1.25){
+     finishRound('TAGGED!');
+   }
+ }
+ // Right-side free-look: ignore touches that begin on action buttons or joystick.
+canvas.addEventListener('pointerdown',e=>{
+ if(e.clientX<innerWidth*.45||!game.started)return;
+ lookPointer=e.pointerId;lookLastX=e.clientX;lookLastY=e.clientY;canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove',e=>{
+ if(e.pointerId!==lookPointer)return;
+ const dx=e.clientX-lookLastX,dy=e.clientY-lookLastY;lookLastX=e.clientX;lookLastY=e.clientY;
+ cameraHeading-=dx*.0048;cameraPitch=Math.max(-.20,Math.min(.42,cameraPitch-dy*.004));
+});
+function endLook(e){if(e.pointerId===lookPointer)lookPointer=null}
+canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercancel',endLook);
+ function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
+ function loop(now){requestAnimationFrame(loop);let dt=Math.min((now-last)/1000,.033);last=now;
+   if(game.started&&!game.between&&!game.paused){
+     game.time=Math.max(0,game.time-dt);
+     if(game.time<=0)finishRound('SURVIVED!');
+   }
+   roundInfo.textContent='ROUND '+game.round+'/'+game.totalRounds+' • 0:'+String(Math.ceil(game.time)).padStart(2,'0');
+   if(game.paused){
+     renderer.render(scene,camera);
+     return;
+   }
+   let ix=state.joyX+(keys.d?1:0)-(keys.a?1:0), iz=state.joyY+(keys.s?1:0)-(keys.w?1:0);if(!game.started||game.between||game.paused){ix=0;iz=0;}let mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;mag=1}
+   const wantsSprint=(state.sprint||state.autoSprint||keys.shift)&&mag>.12&&state.stamina>0;let speed=wantsSprint?7.4:5.25;if(state.slide&&mag>.15&&state.stamina>1){speed=8.0;state.stamina=Math.max(0,state.stamina-9*dt)}
+   if(wantsSprint){state.stamina=Math.max(0,state.stamina-12*dt)}else if(!state.slide){state.stamina=Math.min(150,state.stamina+14*dt)}
+   // Direct screen-relative joystick movement.
+   // The stick position is the travel direction: up/left/right/down map directly to the screen.
+   let desired=new THREE.Vector3();
+   if(mag>.06){
+     // Use the current camera heading only as the screen reference.
+     const screenForward=new THREE.Vector3(Math.sin(cameraHeading),0,Math.cos(cameraHeading));
+     const screenRight=new THREE.Vector3(-Math.cos(cameraHeading),0,Math.sin(cameraHeading));
+     desired.addScaledVector(screenRight,ix).addScaledVector(screenForward,-iz).normalize();
+
+     // Runner faces exactly where the joystick is sending them.
+     const targetFacing=Math.atan2(desired.x,desired.z);
+     let faceDelta=Math.atan2(Math.sin(targetFacing-state.facing),Math.cos(targetFacing-state.facing));
+     const faceStep=8.5*dt;
+     faceDelta=Math.max(-faceStep,Math.min(faceStep,faceDelta));
+     state.facing+=faceDelta;
+     runner.rotation.y=state.facing;
+
+     // Movement heading simply records actual travel; it no longer modifies joystick input.
+     movementHeading=targetFacing;
+   }
+   if(state.parkourTimer>0){state.parkourTimer-=dt;speed=Math.max(speed,state.parkourBoost);desired.set(Math.sin(state.facing),0,Math.cos(state.facing))}
+   const nx=runner.position.x+desired.x*speed*dt,nz=runner.position.z+desired.z*speed*dt;
+   if(!blocked(nx,runner.position.z))runner.position.x=nx;
+   if(!blocked(runner.position.x,nz))runner.position.z=nz;
+   clampArena(runner);
+   // Robust platform support: feet are authoritative and snap to platform tops.
+   if(!state.onGround){
+     const oldFeet=runner.position.y;
+     state.yVel-=17.5*dt;
+     let newFeet=oldFeet+state.yVel*dt;
+     let bestTop=-1,bestObj=null;
+
+     if(state.yVel<=0){
+       for(const o of obstacles){
+         if(!insideXZ(o,runner.position.x,runner.position.z,.30)) continue;
+         // Swept crossing test with extra tolerance for fast movement / mobile frame drops.
+         if(oldFeet>=o.h-.20 && newFeet<=o.h+.28 && o.h>bestTop){
+           bestTop=o.h;bestObj=o;
+         }
+       }
+     }
+
+     if(bestObj){
+       runner.position.y=bestTop;
+       state.yVel=0;
+       state.onGround=true;
+       state.support=bestObj;
+     }else{
+       runner.position.y=newFeet;
+       if(runner.position.y<=0){
+         runner.position.y=0;state.yVel=0;state.onGround=true;state.support=null;
+       }
+     }
+   }else{
+     if(state.support){
+       // Stay exactly on the top while still horizontally over this platform.
+       if(insideXZ(state.support,runner.position.x,runner.position.z,.08)){
+         runner.position.y=state.support.h;
+         state.yVel=0;
+       }else{
+         state.onGround=false;
+         state.support=null;
+         state.yVel=0;
+       }
+     }else{
+       // Recover support if feet are already near a platform top.
+       let recovered=null,top=0;
+       for(const o of obstacles){
+         if(insideXZ(o,runner.position.x,runner.position.z,.22) &&
+            Math.abs(runner.position.y-o.h)<.38 && o.h>top){
+           recovered=o;top=o.h;
+         }
+       }
+       if(recovered){
+         state.support=recovered;runner.position.y=top;state.yVel=0;
+       }else{
+         runner.position.y=0;
+       }
+     }
+   }
+   // simple run motion
+   const moving=mag>.12;const phase=now*.012*(wantsSprint?1.4:1);legL.rotation.x=moving?Math.sin(phase)*.55:0;legR.rotation.x=moving?-Math.sin(phase)*.55:0;torso.rotation.z=state.slide?.18:0;runner.scale.y=state.slide?.72:1;
+   updateBot(dt,now);
+   // Free-look camera: right-thumb camera movement does not directly steer the runner.
+   // After release, it recenters slowly so the player has time to inspect their surroundings.
+   if(lookPointer===null){
+     // Settle behind the runner after joystick direction changes.
+     let camDelta=Math.atan2(Math.sin(state.facing-cameraHeading),Math.cos(state.facing-cameraHeading));
+     const followRate=mag>.10?5.8:2.8;
+     cameraHeading+=camDelta*Math.min(1,followRate*dt);
+   }
+   const cameraViewAngle=cameraHeading;
+   const back=new THREE.Vector3(-Math.sin(cameraViewAngle)*5.8,3.5+cameraPitch*3.0,-Math.cos(cameraViewAngle)*5.8);
+   const target=runner.position.clone().add(back);camera.position.lerp(target,1-Math.pow(.001,dt));
+   const look=runner.position.clone().add(new THREE.Vector3(0,1.15+cameraPitch,0)).add(new THREE.Vector3(Math.sin(cameraViewAngle),0,Math.cos(cameraViewAngle)).multiplyScalar(2.2));camera.lookAt(look);
+   document.getElementById('stam').style.width=(state.stamina/150*100)+'%';renderer.render(scene,camera)
+ }requestAnimationFrame(loop);document.getElementById('loading').style.display='none';
+}catch(err){console.error(err);document.getElementById('loading').style.display='none';document.getElementById('error').style.display='flex'}
+})();
+</script>
+</body></html>
