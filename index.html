@@ -388,7 +388,7 @@ document.getElementById('jump').addEventListener('pointerdown',jump);document.ge
    let blockedX=false,blockedZ=false;
    let underGate=false;
    for(const g of overheads){
-     if(botInside(g,bx,bz,.30)&&bot.position.y<g.bottom){underGate=true;botState.slideTimer=Math.max(botState.slideTimer,.28);}
+     if(botInside(g,bx,bz,.30)&&bot.position.y<g.bottom){underGate=true;botState.slideTimer=Math.max(botState.slideTimer,.28);}else if(botInside(g,bx,bz,.30)&&bot.position.y<g.bottom+g.h){blockedX=true;blockedZ=true;}
    }
    for(const o of obstacles){
      if(botInside(o,bx,bot.position.z,.30)&&bot.position.y<o.h-.16&&botState.parkourTimer<=0)blockedX=true;
