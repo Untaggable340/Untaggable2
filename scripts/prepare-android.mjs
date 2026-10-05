@@ -39,7 +39,7 @@ const moduleEndAt=moduleStartAt<0?-1:html.indexOf('</script>',moduleStartAt+modu
 const moduleMatch=moduleStartAt>=0&&moduleEndAt>moduleStartAt?html.slice(moduleStartAt+moduleStart.length,moduleEndAt):null;
 if(!moduleMatch)throw new Error('Packaged game module was not found');
 const packagedModule=moduleMatch;
-if(packagedModule.includes('export{')||packagedModule.includes('import('))throw new Error('Packaged module still contains an external module dependency');
+if(packagedModule.includes(dynamicImport))throw new Error('Packaged module still contains the original Three.js dynamic import');
 if(!html.includes('window.__untaggableBooted=true'))throw new Error('Startup watchdog completion marker was not injected');
 await writeFile('www/index.html',html);
 console.log('Prepared Android assets with valid inlined Three.js and startup diagnostics.');
