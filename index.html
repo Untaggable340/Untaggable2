@@ -69,7 +69,7 @@ try{
  const canvas=document.getElementById('game');
  const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  const MAX_RENDER_W=1920,MAX_RENDER_H=1080;
- function targetPixelRatio(){const dpr=Math.max(1,devicePixelRatio||1),w=Math.max(1,innerWidth),h=Math.max(1,innerHeight);return Math.min(dpr,2,MAX_RENDER_W/w,MAX_RENDER_H/h)}
+ function targetPixelRatio(){const dpr=Math.max(1,devicePixelRatio||1),w=Math.max(1,innerWidth),h=Math.max(1,innerHeight),cap=Math.min(MAX_RENDER_W/w,MAX_RENDER_H/h);return Math.max(.75,Math.min(dpr,2,cap))}
  const scene=new THREE.Scene(); scene.background=new THREE.Color(0x8fa7b5); scene.fog=new THREE.Fog(0x8fa7b5,45,115);
  const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,200);
  scene.add(new THREE.HemisphereLight(0xdbeeff,0x42503d,2.1)); const sun=new THREE.DirectionalLight(0xffffff,2.3);sun.position.set(-18,28,10);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;scene.add(sun);
