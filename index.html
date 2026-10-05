@@ -62,7 +62,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0d1117;col
  <div id="buttons"><div class="action" id="sprint"><span class="icon">»</span><span class="word">SPRINT</span></div><div class="action" id="parkour"><span class="icon">↗</span><span class="word">PARKOUR</span></div><div class="action" id="slide"><span class="icon">▱</span><span class="word">SLIDE</span></div><div class="action" id="jump"><span class="icon">↥</span><span class="word">JUMP</span></div></div>
 </div>
 <div id="rotate"><div><span>📱</span>TURN YOUR PHONE SIDEWAYS<br><small>Untaggable 3D is designed for landscape play.</small></div></div>
-<script src="./vendor/three.min.js"></script>\n<script>\n(async()=>{\ntry{
+<script type="module">\nimport * as THREE from "./vendor/three.module.min.js";\n(async()=>{\ntry{
  const canvas=document.getElementById('game');
  const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio||1,2)); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  const scene=new THREE.Scene(); scene.background=new THREE.Color(0x8fa7b5); scene.fog=new THREE.Fog(0x8fa7b5,45,115);
