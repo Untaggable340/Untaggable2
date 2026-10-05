@@ -132,6 +132,10 @@ try{
  const cheekGeo=new THREE.SphereGeometry(.062,24,16),cheekL=new THREE.Mesh(cheekGeo,skin),cheekR=cheekL.clone();cheekL.scale.set(1,.55,.42);cheekR.scale.copy(cheekL.scale);cheekL.position.set(-.145,1.93,.245);cheekR.position.set(.145,1.93,.245);runner.add(cheekL,cheekR);cheekL.userData.skinRole='skin';cheekR.userData.skinRole='skin';
  const jawSideGeo=new THREE.SphereGeometry(.105,18,12),jawSideL=new THREE.Mesh(jawSideGeo,skin),jawSideR=jawSideL.clone();jawSideL.scale.set(.58,.72,.62);jawSideR.scale.copy(jawSideL.scale);jawSideL.position.set(-.145,1.855,.10);jawSideR.position.set(.145,1.855,.10);runner.add(jawSideL,jawSideR);jawSideL.userData.skinRole='skin';jawSideR.userData.skinRole='skin';jawSideL.castShadow=jawSideR.castShadow=true;jawSideL.receiveShadow=jawSideR.receiveShadow=true;
  const chin=new THREE.Mesh(new THREE.SphereGeometry(.075,18,12),skin);chin.scale.set(.92,.58,.56);chin.position.set(0,1.825,.205);runner.add(chin);chin.userData.skinRole='skin';
+ // Subtle facial planes add definition without changing the shared rig.
+ const philtrum=new THREE.Mesh(new THREE.BoxGeometry(.025,.045,.012),skin);philtrum.position.set(0,1.905,.286);runner.add(philtrum);philtrum.userData.skinRole='skin';
+ const lowerLip=new THREE.Mesh(new THREE.CapsuleGeometry(.006,.065,6,10),new THREE.MeshStandardMaterial({color:0x80504a,roughness:.76}));lowerLip.rotation.z=Math.PI/2;lowerLip.position.set(0,1.862,.292);runner.add(lowerLip);
+ const jawLineGeo=new THREE.CapsuleGeometry(.012,.115,5,8),jawLineL=new THREE.Mesh(jawLineGeo,skin),jawLineR=jawLineL.clone();jawLineL.position.set(-.105,1.845,.165);jawLineR.position.set(.105,1.845,.165);jawLineL.rotation.z=-.62;jawLineR.rotation.z=.62;runner.add(jawLineL,jawLineR);jawLineL.userData.skinRole='skin';jawLineR.userData.skinRole='skin';
  const neckShadow=new THREE.Mesh(new THREE.CylinderGeometry(.125,.14,.08,12),skin);neckShadow.position.y=1.66;runner.add(neckShadow);neckShadow.userData.skinRole='skin';
  const earGeo=new THREE.SphereGeometry(.038,10,8),earL=new THREE.Mesh(earGeo,skin),earR=earL.clone();earL.scale.x=.55;earR.scale.x=.55;earL.position.set(-.276,1.99,0);earR.position.set(.276,1.99,0);runner.add(earL,earR);
  const templeGeo=new THREE.SphereGeometry(.075,18,12),templeL=new THREE.Mesh(templeGeo,skin),templeR=templeL.clone();templeL.scale.set(.45,1,.65);templeR.scale.copy(templeL.scale);templeL.position.set(-.235,2.025,.10);templeR.position.set(.235,2.025,.10);runner.add(templeL,templeR);templeL.userData.skinRole='skin';templeR.userData.skinRole='skin';
@@ -279,6 +283,8 @@ const faceProfiles={
 },fp=faceProfiles[name];
 jaw.scale.set(.84*fp.jaw[0],.58*fp.jaw[1],.78*fp.jaw[2]);
 cheekL.scale.set(1*fp.cheek[0],.55*fp.cheek[1],.42*fp.cheek[2]);cheekR.scale.copy(cheekL.scale);
+jawLineL.scale.x=jawLineR.scale.x=name==='Owen'?1.10:(name==='Trinity'?.90:1);
+chin.scale.x=.92*(name==='Owen'?1.08:(name==='Gwen'?.94:1));
 browL.rotation.z=-fp.brow;browR.rotation.z=fp.brow;
 // Outfit silhouette varies per runner while retaining the shared parkour rig.
 collar.scale.set(fp.collar[0],fp.collar[0],fp.collar[1]);
