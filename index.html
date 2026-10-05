@@ -466,7 +466,7 @@ canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercan
      // Movement heading simply records actual travel; it no longer modifies joystick input.
      movementHeading=targetFacing;
    }
-   if(state.parkourTimer>0){state.parkourTimer-=dt;speed=Math.max(speed,state.parkourBoost);desired.set(Math.sin(state.facing),0,Math.cos(state.facing))}
+   if(state.parkourTimer>0){state.parkourTimer=Math.max(0,state.parkourTimer-dt);speed=Math.max(speed,state.parkourBoost);desired.set(Math.sin(state.facing),0,Math.cos(state.facing))}
    const nx=runner.position.x+desired.x*speed*dt,nz=runner.position.z+desired.z*speed*dt;
    if(!blocked(nx,runner.position.z))runner.position.x=nx;
    if(!blocked(runner.position.x,nz))runner.position.z=nz;
