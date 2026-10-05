@@ -28,6 +28,15 @@ window.addEventListener('unhandledrejection',function(e){var l=document.getEleme
 setTimeout(function(){if(!window.__untaggableBooted){var l=document.getElementById('loading'),x=document.getElementById('error');if(l)l.style.display='none';if(x){x.textContent='STARTUP ERROR: initialization timed out';x.style.display='flex';}}},12000);
 </script>`;
 html=html.replace('<script type="module">',watchdog+'\n<script type="module">');
-html=html.replace("}requestAnimationFrame(loop);document.getElementById('loading').style.display='none';","}requestAnimationFrame(loop);window.__untaggableBooted=true;document.getElementById('loading').style.display='none';");
+const bootMarker="}requestAnimationFrame(loop);document.getElementById('loading').style.display='none';";
+if(!html.includes(bootMarker))throw new Error('Game boot completion marker was not found');
+html=html.replace(bootMarker,"}requestAnimationFrame(loop);window.__untaggableBooted=true;document.getElementById('loading').style.display='none';");
+
+// Fail the build instead of shipping another APK with a malformed packaged module.
+const moduleMatch=html.match(/<script type="module">([\\s\\S]*?)<\\/script>/);
+if(!moduleMatch)throw new Error('Packaged game module was not found');
+const packagedModule=moduleMatch[1];
+if(/\\bexport\\s*\\{/.test(packagedModule)||/\\bimport\\s*\\(/.test(packagedModule))throw new Error('Packaged module still contains an external module dependency');
+if(!html.includes('window.__untaggableBooted=true'))throw new Error('Startup watchdog completion marker was not injected');
 await writeFile('www/index.html',html);
 console.log('Prepared Android assets with valid inlined Three.js and startup diagnostics.');
