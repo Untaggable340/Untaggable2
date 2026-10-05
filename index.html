@@ -413,7 +413,7 @@ const pauseBtn=document.getElementById('pauseBtn'),pauseMenu=document.getElement
 const tutorial=document.getElementById('tutorial');document.getElementById('tutorialBtn').addEventListener('click',()=>{document.body.classList.add('uiOpen');document.getElementById('menu').style.display='none';tutorial.style.display='flex'});document.getElementById('tutorialBack').addEventListener('click',()=>{tutorial.style.display='none';document.getElementById('menu').style.display='flex';document.body.classList.remove('uiOpen')});
 function setPaused(v){
  if(!game.offlineBot||!game.started||game.between)return;
- game.paused=v;pauseMenu.style.display=v?'flex':'none';
+ game.paused=v;pauseMenu.style.display=v?'flex':'none';if(!v)last=performance.now();
  if(v){Object.keys(keys).forEach(k=>keys[k]=false);state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.slide=false;state.crouch=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.joyX=state.joyY=0;lookPointer=null;jid=null;sprintPointer=null;slidePointer=null;sprintBtn?.classList.remove('active','auto');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');}
 }
 pauseBtn.addEventListener('click',()=>setPaused(true));
