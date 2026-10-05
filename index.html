@@ -124,6 +124,13 @@ detailSlab(-27,-28,13,2.2,.34,capMat,4.9);detailSlab(27,-25,13,2.2,.34,capMat,4.
 const bridgeMat=new THREE.MeshStandardMaterial({color:0xaeadA6,roughness:.96});
 const bridge=new THREE.Mesh(new THREE.BoxGeometry(12,.38,2.6),bridgeMat);bridge.position.set(0,3.75,45);bridge.castShadow=true;bridge.receiveShadow=true;scene.add(bridge);
 for(const x of [-5.5,5.5]){const support=new THREE.Mesh(new THREE.BoxGeometry(.65,3.8,.65),concreteDark);support.position.set(x,1.9,45);support.castShadow=true;scene.add(support)}
+// Parkour route pass: readable ascending side routes, vault blocks and landing pads.
+for(let i=0;i<4;i++){concreteBlock(-38+i*2.2,-45+i*4.2,3.6,3.6,.65+i*.48);concreteBlock(38-i*2.2,-42+i*4.2,3.6,3.6,.65+i*.48)}
+concreteBlock(-26,-12,5.5,1.3,.82);concreteBlock(-20,-16,5.5,1.3,1.12);concreteBlock(-14,-20,5.5,1.3,1.42);
+concreteBlock(26,-10,5.5,1.3,.82);concreteBlock(20,-14,5.5,1.3,1.12);concreteBlock(14,-18,5.5,1.3,1.42);
+detailSlab(-17,-27,8,5,.22,capMat,2.25);detailSlab(17,-25,8,5,.22,capMat,2.25);
+// Thin dark strips visually mark ledge lips so jumps remain readable on small mobile screens.
+for(const x of [-26,-20,-14,14,20,26]){const lip=new THREE.Mesh(new THREE.BoxGeometry(5.3,.045,.10),concreteDark);lip.position.set(x,x<0?(.02*x-.15):(.02*x-.43),-0.0);lip.visible=false;scene.add(lip)}
 
 
  function box(x,z,w,d,h,color=0x8a7f70,label=''){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,roughness:.85}));m.position.set(x,h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);obstacles.push({mesh:m,x,z,w,d,h,label,climbOnly:label==='CLIMB ONLY'});return m}
