@@ -83,7 +83,7 @@ try{
 // Arena visual pass: pale concrete parkour bowl inspired by the supplied reference, while keeping gameplay collision routes intact.
 const concreteMat=new THREE.MeshStandardMaterial({color:0xb9b8b1,roughness:.96,metalness:0});
 const concreteDark=new THREE.MeshStandardMaterial({color:0x777873,roughness:.98,metalness:0});
-function concreteBlock(x,z,w,d,h,y=0,solid=false){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),concreteMat);m.position.set(x,y+h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);if(solid&&y===0)obstacles.push({mesh:m,x,z,w,d,h,label:'ARENA',climbOnly:false});return m}
+function concreteBlock(x,z,w,d,h,y=0,solid=false){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),concreteMat);m.position.set(x,y+h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);if(solid&&y===0){obstacles.push({mesh:m,x,z,w,d,h,label:'ARENA',climbOnly:false});m.userData.arenaSolid=true}return m}
 function concreteRamp(x,z,w,d,h,ry=0){const g=new THREE.BoxGeometry(w,.32,d),m=new THREE.Mesh(g,concreteMat);m.position.set(x,h*.48,z);m.rotation.set(-Math.atan2(h,d),ry,0);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
 // Raised central sparring/parkour dais with stepped edges.
 concreteBlock(0,18,14,11,.32);concreteBlock(0,18,11.8,8.8,.64);concreteBlock(0,18,9.5,6.6,.96,0,true);
@@ -162,7 +162,7 @@ scene.traverse(o=>{if(o.isMesh){if(o.geometry&&o.geometry.type==='BoxGeometry'&&
 // Cull purely decorative arena detail sooner than gameplay geometry on small/mobile GPUs.
 for(const o of arenaStaticMeshes){if(o.geometry&&o.geometry.computeBoundingSphere)o.geometry.computeBoundingSphere();o.frustumCulled=true}
 // Rendering stability: decorative meshes never participate in gameplay ray/collision intent.
-for(const o of arenaStaticMeshes){o.userData.arenaDecor=true}
+for(const o of arenaStaticMeshes){if(!o.userData.arenaSolid)o.userData.arenaDecor=true}
 
 // Keep high-value near-ground shadows while reducing expensive shadow casters in dense upper architecture.
 
