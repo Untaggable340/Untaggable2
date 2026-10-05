@@ -161,6 +161,8 @@ const arenaStaticMeshes=[];
 scene.traverse(o=>{if(o.isMesh&&o!==runner&&!o.userData.skinRole){if(o.geometry&&o.geometry.type==='BoxGeometry'&&o.position.y>3.2){o.castShadow=false}if(o.material===wearMat||o.material===edgeMat||o.material===capMat){o.castShadow=false}arenaStaticMeshes.push(o)}});
 // Cull purely decorative arena detail sooner than gameplay geometry on small/mobile GPUs.
 for(const o of arenaStaticMeshes){if(o.geometry&&o.geometry.computeBoundingSphere)o.geometry.computeBoundingSphere();o.frustumCulled=true}
+// Rendering stability: decorative meshes never participate in gameplay ray/collision intent.
+for(const o of arenaStaticMeshes){if(!obstacles.some(v=>v.mesh===o)&&!overheads.some(v=>v.mesh===o)){o.userData.arenaDecor=true}}
 
 // Keep high-value near-ground shadows while reducing expensive shadow casters in dense upper architecture.
 
