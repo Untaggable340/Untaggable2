@@ -506,7 +506,7 @@ document.getElementById('jump').addEventListener('pointerdown',jump);document.ge
    }
 
    const wantsSprint=dist>3.2&&botState.stamina>0;
-   let speed=wantsSprint?7.15:5.15; // just under the player's speeds
+   let speed=wantsSprint?7.78:5.15; // preserve the intended slight open-ground bot advantage so parkour/cuts matter
    if(wantsSprint)botState.stamina=Math.max(0,botState.stamina-11*dt);
    else botState.stamina=Math.min(150,botState.stamina+14*dt);
    if(botState.parkourTimer>0)speed=Math.max(speed,6.8);
