@@ -1,0 +1,23 @@
+name: Web boot smoke test
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm install --no-save playwright@1.55.0
+      - run: npx playwright install --with-deps chromium
+      - name: Start local web server
+        run: |
+          python3 -m http.server 8000 >/tmp/untaggable-server.log 2>&1 &
+          sleep 2
+      - name: Run mobile browser boot smoke test
+        run: node scripts/web-smoke.mjs
