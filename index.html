@@ -97,8 +97,8 @@ try{
  box(-19,-18,9,12,4.5,0x5d6467); box(20,-38,11,16,6,0x596168); box(-21,-58,10,14,5.2,0x626a6c);
  const runner=new THREE.Group();scene.add(runner);
  const shirt=new THREE.MeshStandardMaterial({color:0x26384b,roughness:.75}), skin=new THREE.MeshStandardMaterial({color:0xc28b6b,roughness:.8}), pants=new THREE.MeshStandardMaterial({color:0x20252b,roughness:.9}),shoeMat=new THREE.MeshStandardMaterial({color:0x111820,roughness:.85}),hairMat=new THREE.MeshStandardMaterial({color:0x30251f,roughness:.95});
- const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.38,.58,8,14),shirt);torso.position.y=1.27;torso.scale.set(1.08,1,.72);torso.castShadow=true;runner.add(torso);
- const chest=new THREE.Mesh(new THREE.SphereGeometry(.38,16,12),shirt);chest.scale.set(1.08,.72,.68);chest.position.y=1.43;runner.add(chest);
+ const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.40,.60,10,18),shirt);torso.position.y=1.27;torso.scale.set(1.08,1,.72);torso.castShadow=true;runner.add(torso);
+ const chest=new THREE.Mesh(new THREE.SphereGeometry(.40,20,16),shirt);chest.scale.set(1.08,.72,.68);chest.position.y=1.43;runner.add(chest);
  const waist=new THREE.Mesh(new THREE.CapsuleGeometry(.27,.24,6,10),shirt);waist.position.y=.98;waist.scale.z=.78;runner.add(waist);
  const neck=new THREE.Mesh(new THREE.CylinderGeometry(.11,.12,.18,10),skin);neck.position.y=1.72;runner.add(neck);
  const head=new THREE.Mesh(new THREE.SphereGeometry(.285,18,14),skin);head.scale.set(.92,1.08,.94);head.position.y=1.98;head.castShadow=true;runner.add(head);
@@ -110,11 +110,15 @@ try{
  const nose=new THREE.Mesh(new THREE.ConeGeometry(.03,.085,8),new THREE.MeshStandardMaterial({color:0xb9785d,roughness:.8}));nose.rotation.x=Math.PI/2;nose.position.set(0,1.93,.292);runner.add(nose);
  const pelvis=new THREE.Mesh(new THREE.BoxGeometry(.55,.24,.34),pants);pelvis.position.y=.82;runner.add(pelvis);
  const shoulders=new THREE.Group();shoulders.position.y=1.48;runner.add(shoulders);
- const armGeo=new THREE.CapsuleGeometry(.115,.48,6,10),armL=new THREE.Mesh(armGeo,skin),armR=armL.clone();armL.position.set(-.43,1.27,0);armR.position.set(.43,1.27,0);armL.rotation.z=-.08;armR.rotation.z=.08;shoulders.add(armL,armR);armL.position.set(-.43,-.21,0);armR.position.set(.43,-.21,0);
+ const armGeo=new THREE.CapsuleGeometry(.125,.50,8,14),armL=new THREE.Mesh(armGeo,skin),armR=armL.clone();armL.position.set(-.43,1.27,0);armR.position.set(.43,1.27,0);armL.rotation.z=-.08;armR.rotation.z=.08;shoulders.add(armL,armR);armL.position.set(-.43,-.21,0);armR.position.set(.43,-.21,0);
  const handGeo=new THREE.SphereGeometry(.115,12,9),handL=new THREE.Mesh(handGeo,skin),handR=handL.clone();handL.position.set(-.46,.91,0);handR.position.set(.46,.91,0);armL.add(handL);armR.add(handR);handL.position.set(0,-.36,0);handR.position.set(0,-.36,0);
  const frontPatch=new THREE.Mesh(new THREE.BoxGeometry(.20,.27,.035),new THREE.MeshStandardMaterial({color:0xd8e2e8,roughness:.7}));frontPatch.position.set(0,0,.49);torso.add(frontPatch);
  const backPatch=new THREE.Mesh(new THREE.BoxGeometry(.25,.29,.035),new THREE.MeshStandardMaterial({color:0x17202a,roughness:.75}));backPatch.position.set(0,0,-.49);torso.add(backPatch);
- const legL=new THREE.Mesh(new THREE.CapsuleGeometry(.145,.56,6,10),pants),legR=legL.clone();legL.position.set(-.17,.49,0);legR.position.set(.17,.49,0);runner.add(legL,legR);
+ const legL=new THREE.Mesh(new THREE.CapsuleGeometry(.16,.58,8,14),pants),legR=legL.clone();legL.position.set(-.17,.49,0);legR.position.set(.17,.49,0);runner.add(legL,legR);
+const cargoMat=pants.clone();
+const cargoPocketL=new THREE.Mesh(new THREE.BoxGeometry(.13,.18,.055),cargoMat),cargoPocketR=cargoPocketL.clone();
+cargoPocketL.position.set(-.17,.53,.16);cargoPocketR.position.set(.17,.53,.16);runner.add(cargoPocketL,cargoPocketR);
+cargoPocketL.userData.skinRole='pants';cargoPocketR.userData.skinRole='pants';
  const shoeGeo=new THREE.BoxGeometry(.25,.17,.42),shoeL=new THREE.Mesh(shoeGeo,shoeMat),shoeR=shoeL.clone();legL.add(shoeL);legR.add(shoeR);shoeL.position.set(0,-.40,.07);shoeR.position.set(0,-.40,.07);
  [neck,head,armL,armR,handL,handR].forEach(m=>m.userData.skinRole='skin');[torso,chest,waist].forEach(m=>m.userData.skinRole='shirt');[pelvis,legL,legR].forEach(m=>m.userData.skinRole='pants');[hair,hairBack,hairSideL,hairSideR].forEach(m=>m.userData.skinRole='hair');[shoeL,shoeR].forEach(m=>m.userData.skinRole='shoe');
  runner.position.set(0,0,10);
