@@ -71,12 +71,12 @@ try{
  const scene=new THREE.Scene(); scene.background=new THREE.Color(0x8fa7b5); scene.fog=new THREE.Fog(0x8fa7b5,45,115);
  const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,200);
  scene.add(new THREE.HemisphereLight(0xdbeeff,0x42503d,2.1)); const sun=new THREE.DirectionalLight(0xffffff,2.3);sun.position.set(-18,28,10);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;scene.add(sun);
- const ground=new THREE.Mesh(new THREE.PlaneGeometry(90,120),new THREE.MeshStandardMaterial({color:0x68746d,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+ const ground=new THREE.Mesh(new THREE.PlaneGeometry(90,160),new THREE.MeshStandardMaterial({color:0x68746d,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
  const grid=new THREE.GridHelper(90,30,0x48544f,0x718078);grid.position.y=.012;scene.add(grid);
- const arenaHalfX=43.0,arenaMinZ=-58.0,arenaMaxZ=58.0,wallH=3.2,wallT=1.0;
+ const arenaHalfX=43.0,arenaMinZ=-78.0,arenaMaxZ=58.0,wallH=3.2,wallT=1.0;
  const wallMat=new THREE.MeshStandardMaterial({color:0x4f5858,roughness:.95});
  function arenaWall(x,z,w,d){const m=new THREE.Mesh(new THREE.BoxGeometry(w,wallH,d),wallMat);m.position.set(x,wallH/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m)}
- arenaWall(-44,0,wallT,120);arenaWall(44,0,wallT,120);arenaWall(0,-59.5,88,wallT);arenaWall(0,59.5,88,wallT);
+ arenaWall(-44,-10,wallT,140);arenaWall(44,-10,wallT,140);arenaWall(0,-79.5,88,wallT);arenaWall(0,59.5,88,wallT);
  function clampArena(obj){obj.position.x=Math.max(-arenaHalfX,Math.min(arenaHalfX,obj.position.x));obj.position.z=Math.max(arenaMinZ,Math.min(arenaMaxZ,obj.position.z));}
 
  const obstacles=[];
