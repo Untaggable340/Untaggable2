@@ -9,7 +9,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0d1117;col
 #game{position:fixed;inset:0;width:100%;height:100%;display:block}
 #loading,#error{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;background:#0d1117;z-index:50;font-weight:800;line-height:1.45}
 #error{display:none;color:#ffd5d5}
-#hud{position:fixed;inset:0;pointer-events:none;z-index:10}
+#hud{position:fixed;inset:0;pointer-events:none;z-index:10}.uiOpen #joy,.uiOpen #buttons,.uiOpen #pauseBtn{pointer-events:none!important}
 #top{position:absolute;left:max(18px,env(safe-area-inset-left));right:max(18px,env(safe-area-inset-right));top:max(12px,env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:flex-start;text-shadow:0 2px 6px #000}
 #role{font-weight:900;font-size:19px;letter-spacing:.08em}.small{font-size:10px;opacity:.68;margin-top:5px}.hint{text-align:right;max-width:310px;font-size:11px;opacity:.7;line-height:1.35}
 #stamWrap{width:min(250px,30vw);height:10px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:99px;overflow:hidden;margin-top:6px}#stam{height:100%;width:100%;background:#f0f4f8;transition:width .08s linear}
@@ -136,7 +136,7 @@ const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,act
 let game={started:false,totalRounds:1,round:1,time:60,between:false,paused:false,offlineBot:true};
 let cameraHeading=Math.PI,movementHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
 function resetRound(){
- runner.position.set(0,0,10);state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;
+ runner.position.set(0,0,10);state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.sprint=false;state.autoSprint=false;state.joyX=0;state.joyY=0;sprintBtn?.classList.remove('auto','active');knob&&(knob.style.transform='');
  bot.position.set(0,0,17);chooseBotCharacter();botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;
  botState.headStart=5;botState.headStartDone=false;game.time=60;game.between=false;cameraHeading=state.facing;movementHeading=state.facing;cameraPitch=.05;
 }
@@ -144,7 +144,7 @@ function finishRound(reason){
  if(game.between)return;game.between=true;
  toast(reason);
  if(game.round>=game.totalRounds){
-   setTimeout(()=>{game.started=false;pauseBtn.style.display='none';document.getElementById('menu').style.display='flex';toast('MATCH COMPLETE');},900);
+   setTimeout(()=>{game.started=false;state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.crouch=false;state.slide=false;sprintBtn?.classList.remove('active','auto');knob&&(knob.style.transform='');pauseBtn.style.display='none';document.getElementById('menu').style.display='flex';toast('MATCH COMPLETE');},900);
  }else{
    game.round++;
    setTimeout(()=>resetRound(),900);
@@ -155,19 +155,19 @@ let selectedCharacter='Finn';
 function applyCharacter(name){selectedCharacter=name;const l=characterLooks[name];skin.color.setHex(l.skin);shirt.color.setHex(l.shirt);pants.color.setHex(l.pants);hairMat.color.setHex(l.hair);shoeMat.color.setHex(l.shoe);runner.scale.set(...l.scale);torso.scale.set(1.08*l.build[0],l.build[1],.72*l.build[2]);chest.scale.set(1.08*l.build[0],.72*l.build[1],.68*l.build[2]);pelvis.scale.x=l.build[0];shoulders.scale.x=l.build[0];hairBack.visible=l.hairStyle==='long';hairSideL.visible=hairSideR.visible=l.hairStyle==='sides';hair.scale.set(l.hairStyle==='close'?.88:.95,l.hairStyle==='close'?.42:.72,l.hairStyle==='close'?.90:.96);document.querySelectorAll('.characterChoice').forEach(b=>b.classList.toggle('selected',b.dataset.character===name));}
 const charNames=['Finn','Gwen','Trinity','Owen'];let previewIndex=0;const charSelect=document.getElementById('characterSelect'),previewPerson=document.getElementById('previewPerson');
 function showPreview(){const name=charNames[previewIndex],l=characterLooks[name];document.getElementById('previewName').textContent=name.toUpperCase();document.getElementById('previewTag').textContent={Finn:'BALANCED PARKOUR RUNNER',Gwen:'QUICK • AGILE • FEARLESS',Trinity:'CONTROLLED • SHARP • FAST',Owen:'POWERFUL • ATHLETIC • STEADY'}[name];document.getElementById('confirmCharacter').textContent='SELECT '+name.toUpperCase();previewPerson.style.setProperty('--skin','#'+l.skin.toString(16).padStart(6,'0'));previewPerson.style.setProperty('--hair','#'+l.hair.toString(16).padStart(6,'0'));previewPerson.style.setProperty('--shirt','#'+l.shirt.toString(16).padStart(6,'0'));previewPerson.style.setProperty('--pants','#'+l.pants.toString(16).padStart(6,'0'));previewPerson.style.setProperty('--shoe','#'+l.shoe.toString(16).padStart(6,'0'));previewPerson.dataset.style=l.hairStyle;}
-document.getElementById('characterSelectBtn').addEventListener('click',()=>{previewIndex=Math.max(0,charNames.indexOf(selectedCharacter));document.getElementById('menu').style.display='none';charSelect.style.display='flex';showPreview()});
-document.getElementById('prevCharacter').addEventListener('click',()=>{previewIndex=(previewIndex+charNames.length-1)%charNames.length;showPreview()});document.getElementById('nextCharacter').addEventListener('click',()=>{previewIndex=(previewIndex+1)%charNames.length;showPreview()});document.getElementById('confirmCharacter').addEventListener('click',()=>{const name=charNames[previewIndex];applyCharacter(name);document.getElementById('chosenCharacter').textContent=name.toUpperCase();charSelect.style.display='none';document.getElementById('menu').style.display='flex'});
+document.getElementById('characterSelectBtn').addEventListener('click',()=>{document.body.classList.add('uiOpen');previewIndex=Math.max(0,charNames.indexOf(selectedCharacter));document.getElementById('menu').style.display='none';charSelect.style.display='flex';showPreview()});
+document.getElementById('prevCharacter').addEventListener('click',()=>{previewIndex=(previewIndex+charNames.length-1)%charNames.length;showPreview()});document.getElementById('nextCharacter').addEventListener('click',()=>{previewIndex=(previewIndex+1)%charNames.length;showPreview()});document.getElementById('confirmCharacter').addEventListener('click',()=>{const name=charNames[previewIndex];applyCharacter(name);document.getElementById('chosenCharacter').textContent=name.toUpperCase();charSelect.style.display='none';document.getElementById('menu').style.display='flex';document.body.classList.remove('uiOpen')});
 applyCharacter('Finn');showPreview();
 const roundInfo=document.getElementById('roundInfo');
 document.querySelectorAll('.roundChoice').forEach(b=>b.addEventListener('click',()=>{
  document.querySelectorAll('.roundChoice').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');game.totalRounds=Number(b.dataset.rounds);
 }));
 const pauseBtn=document.getElementById('pauseBtn'),pauseMenu=document.getElementById('pauseMenu');
-const tutorial=document.getElementById('tutorial');document.getElementById('tutorialBtn').addEventListener('click',()=>{document.getElementById('menu').style.display='none';tutorial.style.display='flex'});document.getElementById('tutorialBack').addEventListener('click',()=>{tutorial.style.display='none';document.getElementById('menu').style.display='flex'});
+const tutorial=document.getElementById('tutorial');document.getElementById('tutorialBtn').addEventListener('click',()=>{document.body.classList.add('uiOpen');document.getElementById('menu').style.display='none';tutorial.style.display='flex'});document.getElementById('tutorialBack').addEventListener('click',()=>{tutorial.style.display='none';document.getElementById('menu').style.display='flex';document.body.classList.remove('uiOpen')});
 function setPaused(v){
  if(!game.offlineBot||!game.started)return;
  game.paused=v;pauseMenu.style.display=v?'flex':'none';
- if(v){state.sprint=false;state.slide=false;state.crouch=false;state.slideTimer=0;lookPointer=null;sprintBtn?.classList.remove('active');}
+ if(v){state.sprint=false;state.autoSprint=false;state.slide=false;state.crouch=false;state.slideTimer=0;state.joyX=state.joyY=0;lookPointer=null;sprintBtn?.classList.remove('active','auto');knob&&(knob.style.transform='');}
 }
 pauseBtn.addEventListener('click',()=>setPaused(true));
 document.getElementById('resumeGame').addEventListener('click',()=>setPaused(false));
