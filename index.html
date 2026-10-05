@@ -255,6 +255,21 @@ function finishRound(reason){
  }
 }
 function applyCharacter(name){selectedCharacter=name;const l=characterLooks[name];skin.color.setHex(l.skin);shirt.color.setHex(l.shirt);pants.color.setHex(l.pants);hairMat.color.setHex(l.hair);shoeMat.color.setHex(l.shoe);runner.scale.set(...l.scale);torso.scale.set(1.08*l.build[0],l.build[1],.72*l.build[2]);chest.scale.set(1.08*l.build[0],.72*l.build[1],.68*l.build[2]);pelvis.scale.x=1.12*l.build[0];shoulders.scale.x=l.build[0];head.scale.set(baseHeadScale.x*l.head[0],baseHeadScale.y*l.head[1],baseHeadScale.z*l.head[2]);armL.scale.set(baseArmLScale.x*l.limb[0],baseArmLScale.y*l.limb[1],baseArmLScale.z*l.limb[0]);armR.scale.copy(armL.scale);legL.scale.set(baseLegLScale.x*l.limb[0],baseLegLScale.y*l.limb[1],baseLegLScale.z*l.limb[0]);legR.scale.copy(legL.scale);hairBack.visible=l.hairStyle==='long';hairBackL.visible=hairBackR.visible=l.hairStyle==='long';hairSideL.visible=hairSideR.visible=l.hairStyle==='sides'||l.hairStyle==='long';hairTop.visible=l.hairStyle!=='close';hairCrownL.visible=hairCrownR.visible=l.hairStyle==='short'||l.hairStyle==='sides';hairFringeL.visible=hairFringeR.visible=l.hairStyle!=='close';hair.scale.set(l.hairStyle==='close'?.90:.97,l.hairStyle==='close'?.36:.76,l.hairStyle==='close'?.92:.98);hairTop.scale.set(l.hairStyle==='long'?1.16:(l.hairStyle==='sides'?1.06:1.0),l.hairStyle==='long'?.72:.55,l.hairStyle==='long'?1.06:.95);hairFringeL.scale.y=hairFringeR.scale.y=l.hairStyle==='long'?1.35:1;
+// Stronger character-specific hair silhouettes.
+if(name==='Finn'){
+ hairTop.scale.set(1.05,.52,.92);hairCrownL.rotation.z=.72;hairCrownR.rotation.z=-.42;
+ hairFringeL.rotation.z=.48;hairFringeR.rotation.z=-.18;
+}else if(name==='Gwen'){
+ hairTop.scale.set(1.18,.78,1.08);hairBack.scale.set(1.12,1.18,1.04);
+ hairBackL.scale.set(.92,1.22,.92);hairBackR.scale.copy(hairBackL.scale);
+ hairSideL.scale.set(.92,1.18,.92);hairSideR.scale.copy(hairSideL.scale);
+}else if(name==='Trinity'){
+ hairTop.scale.set(1.10,.58,.94);hairSideL.scale.set(.82,1.08,.82);hairSideR.scale.copy(hairSideL.scale);
+ hairCrownL.rotation.z=.28;hairCrownR.rotation.z=-.62;hairFringeL.scale.y=.82;hairFringeR.scale.y=1.12;
+}else if(name==='Owen'){
+ hair.scale.set(.88,.30,.90);hairTop.visible=false;hairCrownL.visible=false;hairCrownR.visible=false;
+ hairFringeL.visible=false;hairFringeR.visible=false;hairSideL.visible=false;hairSideR.visible=false;
+}
 // Per-character facial silhouette: subtle geometry differences keep the shared rig but stop faces reading as recolors.
 const faceProfiles={
  Finn:{jaw:[.98,1.02,1],cheek:[.98,1,1],brow:.08,collar:[1,1],patch:[1,.96],back:[1,1]},
