@@ -110,6 +110,13 @@ for(const x of [-24,-8,8,24]){const r=new THREE.Mesh(new THREE.BoxGeometry(3.0,2
 // Low angular route pieces make the central floor useful for chase cuts instead of decoration only.
 concreteBlock(-9,7,5,2.4,.55);concreteBlock(9,7,5,2.4,.55);
 concreteBlock(-12,1,3.5,5,1.05);concreteBlock(12,1,3.5,5,1.05);
+// Concrete wear language: darker base bands, cap slabs and sparse floor patches add depth without external assets.
+const wearMat=new THREE.MeshStandardMaterial({color:0x969690,roughness:1});
+const capMat=new THREE.MeshStandardMaterial({color:0xc9c8c1,roughness:.94});
+function detailSlab(x,z,w,d,h,mat,y){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.receiveShadow=true;m.castShadow=true;scene.add(m);return m}
+detailSlab(0,58.7,86,.18,.55,wearMat,.28);detailSlab(-43.35,-10,.18,136,.65,wearMat,.32);detailSlab(43.35,-10,.18,136,.65,wearMat,.32);
+for(const x of [-30,-10,10,30]) detailSlab(x,58.45,4.2,.34,.18,capMat,3.22);
+for(const p of [[-22,20,5,3],[22,27,4,6],[-5,38,7,3],[13,43,5,4]]){const m=detailSlab(p[0],p[1],p[2],p[3],.018,wearMat,.02);m.rotation.y=.12*(p[0]>0?1:-1)}
 
 
  function box(x,z,w,d,h,color=0x8a7f70,label=''){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,roughness:.85}));m.position.set(x,h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);obstacles.push({mesh:m,x,z,w,d,h,label,climbOnly:label==='CLIMB ONLY'});return m}
