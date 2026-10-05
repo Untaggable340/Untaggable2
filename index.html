@@ -97,7 +97,7 @@ try{
  box(-19,-18,9,12,4.5,0x5d6467); box(20,-38,11,16,6,0x596168); box(-21,-58,10,14,5.2,0x626a6c);
  const runner=new THREE.Group();scene.add(runner);
  const shirt=new THREE.MeshStandardMaterial({color:0x26384b,roughness:.75}), skin=new THREE.MeshStandardMaterial({color:0xc28b6b,roughness:.8}), pants=new THREE.MeshStandardMaterial({color:0x20252b,roughness:.9}),shoeMat=new THREE.MeshStandardMaterial({color:0x111820,roughness:.85}),hairMat=new THREE.MeshStandardMaterial({color:0x30251f,roughness:.95});
- const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.40,.60,10,18),shirt);torso.position.y=1.27;torso.scale.set(1.08,1,.72);torso.castShadow=true;runner.add(torso);
+ const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.40,.60,10,18),shirt);torso.position.y=1.27;torso.scale.set(1.08,1,.72);torso.castShadow=true;torso.receiveShadow=true;runner.add(torso);
  const upperChest=new THREE.Mesh(new THREE.CapsuleGeometry(.32,.18,8,14),shirt);upperChest.rotation.z=Math.PI/2;upperChest.position.y=1.52;upperChest.scale.set(.82,1.12,.72);runner.add(upperChest);upperChest.userData.skinRole='shirt';
  const chest=new THREE.Mesh(new THREE.SphereGeometry(.40,20,16),shirt);chest.scale.set(1.08,.72,.68);chest.position.y=1.43;runner.add(chest);
  const shoulderCapGeo=new THREE.SphereGeometry(.16,16,12),shoulderCapL=new THREE.Mesh(shoulderCapGeo,shirt),shoulderCapR=shoulderCapL.clone();shoulderCapL.scale.set(1,.78,.82);shoulderCapR.scale.copy(shoulderCapL.scale);shoulderCapL.position.set(-.36,1.47,0);shoulderCapR.position.set(.36,1.47,0);runner.add(shoulderCapL,shoulderCapR);shoulderCapL.userData.skinRole='shirt';shoulderCapR.userData.skinRole='shirt';
@@ -105,7 +105,7 @@ try{
  const hipGeo=new THREE.SphereGeometry(.19,14,10),hipL=new THREE.Mesh(hipGeo,pants),hipR=hipL.clone();
  const gluteGeo=new THREE.SphereGeometry(.18,14,10),gluteL=new THREE.Mesh(gluteGeo,pants),gluteR=gluteL.clone();gluteL.scale.set(.82,.86,.72);gluteR.scale.copy(gluteL.scale);gluteL.position.set(-.16,.76,-.13);gluteR.position.set(.16,.76,-.13);runner.add(gluteL,gluteR);gluteL.userData.skinRole='pants';gluteR.userData.skinRole='pants';hipL.scale.set(.72,.82,.72);hipR.scale.copy(hipL.scale);hipL.position.set(-.18,.78,0);hipR.position.set(.18,.78,0);runner.add(hipL,hipR);hipL.userData.skinRole='pants';hipR.userData.skinRole='pants';
  const neck=new THREE.Mesh(new THREE.CylinderGeometry(.11,.12,.18,10),skin);neck.position.y=1.72;runner.add(neck);
- const head=new THREE.Mesh(new THREE.SphereGeometry(.285,24,18),skin);head.scale.set(.92,1.08,.94);head.position.y=1.98;head.castShadow=true;runner.add(head);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.285,24,18),skin);head.scale.set(.92,1.08,.94);head.position.y=1.98;head.castShadow=true;head.receiveShadow=true;runner.add(head);
  const hair=new THREE.Mesh(new THREE.SphereGeometry(.292,16,10,0,Math.PI*2,0,Math.PI*.55),hairMat);hair.position.y=2.055;hair.scale.set(.95,.72,.96);runner.add(hair);
  const hairTop=new THREE.Mesh(new THREE.SphereGeometry(.19,16,10),hairMat);hairTop.position.set(0,2.17,-.015);hairTop.scale.set(1.05,.55,.95);runner.add(hairTop);
  const hairCrownGeo=new THREE.CapsuleGeometry(.055,.18,6,10),hairCrownL=new THREE.Mesh(hairCrownGeo,hairMat),hairCrownR=hairCrownL.clone();hairCrownL.position.set(-.08,2.16,-.02);hairCrownR.position.set(.08,2.16,-.02);hairCrownL.rotation.z=.55;hairCrownR.rotation.z=-.55;runner.add(hairCrownL,hairCrownR);
