@@ -409,7 +409,7 @@ const tutorial=document.getElementById('tutorial');document.getElementById('tuto
 function setPaused(v){
  if(!game.offlineBot||!game.started||game.between)return;
  game.paused=v;pauseMenu.style.display=v?'flex':'none';
- if(v){Object.keys(keys).forEach(k=>keys[k]=false);state.sprint=false;state.autoSprint=false;state.slide=false;state.crouch=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.joyX=state.joyY=0;lookPointer=null;jid=null;sprintBtn?.classList.remove('active','auto');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');}
+ if(v){Object.keys(keys).forEach(k=>keys[k]=false);state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.slide=false;state.crouch=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.joyX=state.joyY=0;lookPointer=null;jid=null;sprintPointer=null;sprintBtn?.classList.remove('active','auto');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');}
 }
 pauseBtn.addEventListener('click',()=>setPaused(true));
 document.getElementById('resumeGame').addEventListener('click',()=>setPaused(false));
@@ -584,7 +584,7 @@ function endLook(e){if(e.pointerId===lookPointer)lookPointer=null}
 canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercancel',endLook);canvas.addEventListener('lostpointercapture',endLook);
  function resize(){renderer.setPixelRatio(targetPixelRatio());renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
   // Mobile lifecycle safety: never leave movement/look inputs latched after the app loses focus.
-  function releaseInputs(){Object.keys(keys).forEach(k=>keys[k]=false);state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;lookPointer=null;jid=null;sprintBtn.classList.remove('active','auto');slideBtn.classList.remove('active');knob.style.transform='';}
+  function releaseInputs(){Object.keys(keys).forEach(k=>keys[k]=false);state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;lookPointer=null;jid=null;sprintPointer=null;sprintBtn.classList.remove('active','auto');slideBtn.classList.remove('active');knob.style.transform='';}
   addEventListener('blur',releaseInputs);document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseInputs()});
  function loop(now){requestAnimationFrame(loop);let dt=Math.min((now-last)/1000,.033);last=now;
    if(game.started&&!game.between&&!game.paused&&botState.headStartDone){
