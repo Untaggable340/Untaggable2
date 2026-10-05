@@ -353,7 +353,7 @@ sprintBtn.addEventListener('pointerdown',e=>{
 const sprintRelease=()=>{state.sprint=false;sprintBtn.classList.remove('active')};
 sprintBtn.addEventListener('pointerup',sprintRelease);sprintBtn.addEventListener('pointercancel',sprintRelease);
 const slideBtn=document.getElementById('slide');
-slideBtn.addEventListener('pointerdown',e=>{if(!game.started||game.paused||game.between)return;state.crouch=true;state.slide=true;state.slideTimer=(state.sprint||state.autoSprint)?0.78:0;slideBtn.classList.add('active');slideBtn.setPointerCapture(e.pointerId)});
+slideBtn.addEventListener('pointerdown',e=>{if(!game.started||game.paused||game.between)return;state.crouch=true;state.slide=true;state.slideTimer=(state.sprint||state.autoSprint||keys.shift)?0.78:0;slideBtn.classList.add('active');slideBtn.setPointerCapture(e.pointerId)});
 const slideUp=()=>{state.crouch=false;if(state.slideTimer<=0)state.slide=false;slideBtn.classList.remove('active')};slideBtn.addEventListener('pointerup',slideUp);slideBtn.addEventListener('pointercancel',slideUp);
 document.getElementById('jump').addEventListener('pointerdown',jump);document.getElementById('parkour').addEventListener('pointerdown',parkour);
  function botInside(o,x,z,pad=0){return x>o.x-o.w/2-pad&&x<o.x+o.w/2+pad&&z>o.z-o.d/2-pad&&z<o.z+o.d/2+pad}
