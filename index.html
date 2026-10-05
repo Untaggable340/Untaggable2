@@ -119,11 +119,18 @@ try{
  const frontPatch=new THREE.Mesh(new THREE.BoxGeometry(.20,.27,.035),new THREE.MeshStandardMaterial({color:0xd8e2e8,roughness:.7}));frontPatch.position.set(0,0,.49);torso.add(frontPatch);
  const backPatch=new THREE.Mesh(new THREE.BoxGeometry(.25,.29,.035),new THREE.MeshStandardMaterial({color:0x17202a,roughness:.75}));backPatch.position.set(0,0,-.49);torso.add(backPatch);
  const legL=new THREE.Mesh(new THREE.CapsuleGeometry(.16,.58,8,14),pants),legR=legL.clone();legL.position.set(-.17,.49,0);legR.position.set(.17,.49,0);runner.add(legL,legR);
-const cargoMat=pants.clone();
+const shirtSleeveGeo=new THREE.CylinderGeometry(.145,.135,.20,14),shirtSleeveL=new THREE.Mesh(shirtSleeveGeo,shirt),shirtSleeveR=shirtSleeveL.clone();
+ shirtSleeveL.position.set(-.43,1.42,0);shirtSleeveR.position.set(.43,1.42,0);shirtSleeveL.rotation.z=-.08;shirtSleeveR.rotation.z=.08;runner.add(shirtSleeveL,shirtSleeveR);
+ shirtSleeveL.userData.skinRole='shirt';shirtSleeveR.userData.skinRole='shirt';
+ const pantCuffGeo=new THREE.CylinderGeometry(.17,.145,.16,14),pantCuffL=new THREE.Mesh(pantCuffGeo,pants),pantCuffR=pantCuffL.clone();
+ pantCuffL.position.set(-.17,.19,0);pantCuffR.position.set(.17,.19,0);runner.add(pantCuffL,pantCuffR);pantCuffL.userData.skinRole='pants';pantCuffR.userData.skinRole='pants';
+ const cargoMat=pants.clone();
 const cargoPocketL=new THREE.Mesh(new THREE.BoxGeometry(.13,.18,.055),cargoMat),cargoPocketR=cargoPocketL.clone();
 cargoPocketL.position.set(-.17,.53,.16);cargoPocketR.position.set(.17,.53,.16);runner.add(cargoPocketL,cargoPocketR);
 cargoPocketL.userData.skinRole='pants';cargoPocketR.userData.skinRole='pants';
  const shoeGeo=new THREE.BoxGeometry(.25,.17,.42),shoeL=new THREE.Mesh(shoeGeo,shoeMat),shoeR=shoeL.clone();legL.add(shoeL);legR.add(shoeR);shoeL.position.set(0,-.40,.07);shoeR.position.set(0,-.40,.07);
+ const soleMat=new THREE.MeshStandardMaterial({color:0xe8e8e4,roughness:.88}),soleL=new THREE.Mesh(new THREE.BoxGeometry(.265,.045,.44),soleMat),soleR=soleL.clone();shoeL.add(soleL);shoeR.add(soleR);soleL.position.y=-.10;soleR.position.y=-.10;
+ const laceMat=new THREE.MeshStandardMaterial({color:0xc9c9c5,roughness:.9}),laceL=new THREE.Mesh(new THREE.BoxGeometry(.14,.018,.17),laceMat),laceR=laceL.clone();shoeL.add(laceL);shoeR.add(laceR);laceL.position.set(0,.09,.035);laceR.position.set(0,.09,.035);
  [neck,head,armL,armR,handL,handR].forEach(m=>m.userData.skinRole='skin');[torso,chest,waist].forEach(m=>m.userData.skinRole='shirt');[pelvis,legL,legR].forEach(m=>m.userData.skinRole='pants');[hair,hairBack,hairSideL,hairSideR].forEach(m=>m.userData.skinRole='hair');[shoeL,shoeR].forEach(m=>m.userData.skinRole='shoe');
  runner.position.set(0,0,10);
 // Offline tagger uses the same human model as the four playable runners.
