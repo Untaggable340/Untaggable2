@@ -407,7 +407,7 @@ const tutorial=document.getElementById('tutorial');document.getElementById('tuto
 function setPaused(v){
  if(!game.offlineBot||!game.started||game.between)return;
  game.paused=v;pauseMenu.style.display=v?'flex':'none';
- if(v){Object.keys(keys).forEach(k=>keys[k]=false);state.sprint=false;state.autoSprint=false;state.slide=false;state.crouch=false;state.slideTimer=0;state.joyX=state.joyY=0;lookPointer=null;jid=null;sprintBtn?.classList.remove('active','auto');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');}
+ if(v){Object.keys(keys).forEach(k=>keys[k]=false);state.sprint=false;state.autoSprint=false;state.slide=false;state.crouch=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.joyX=state.joyY=0;lookPointer=null;jid=null;sprintBtn?.classList.remove('active','auto');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');}
 }
 pauseBtn.addEventListener('click',()=>setPaused(true));
 document.getElementById('resumeGame').addEventListener('click',()=>setPaused(false));
