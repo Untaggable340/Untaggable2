@@ -484,7 +484,8 @@ document.getElementById('jump').addEventListener('pointerdown',jump);document.ge
      const dx=Math.max(Math.abs(bot.position.x-o.x)-o.w/2,0),dz=Math.max(Math.abs(bot.position.z-o.z)-o.d/2,0);
      const d=Math.hypot(dx,dz),to=new THREE.Vector3(o.x-bot.position.x,0,o.z-bot.position.z);
      if(to.lengthSq()>.001)to.normalize();
-     if(d<range&&f.dot(to)>.28&&d<bd){best=o;bd=d}
+     const probeX=bot.position.x+f.x*Math.min(range,.72),probeZ=bot.position.z+f.z*Math.min(range,.72),inFront=botInside(o,probeX,probeZ,.24);
+     if(d<range&&(inFront||f.dot(to)>.48)&&d<bd){best=o;bd=d}
    }
    return best;
  }
