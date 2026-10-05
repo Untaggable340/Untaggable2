@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Untaggable</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="game">
+  <canvas id="c"></canvas>
+  <div id="hud">
+    <div class="brand">UNTAGGABLE <span id="mode">OFFLINE • NORMAL TAG</span></div>
+    <div class="status"><span id="role">RUNNER</span><span id="timer">60</span></div>
+    <div class="stamina"><i id="staminaFill"></i></div>
+  </div>
+  <div id="message">DON'T GET TAGGED</div>
+  <div id="leftPad"><div id="stick"></div></div>
+  <div id="actions">
+    <button id="sprint"><b>⚡</b><small>SPRINT</small></button>
+    <button id="jump"><b>↑</b><small>JUMP</small></button>
+    <button id="parkour"><b>↗</b><small>PARKOUR</small></button>
+    <button id="slide"><b>▱</b><small>SLIDE</small></button>
+  </div>
+</div>
+<script type="module" src="src/game.js"></script>
+</body></html>
