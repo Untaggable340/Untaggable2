@@ -132,6 +132,7 @@ try{
  const pelvis=new THREE.Mesh(new THREE.BoxGeometry(.55,.24,.34),pants);pelvis.position.y=.82;runner.add(pelvis);
  const belt=new THREE.Mesh(new THREE.BoxGeometry(.57,.075,.355),new THREE.MeshStandardMaterial({color:0x171b20,roughness:.9}));belt.position.y=.91;runner.add(belt);belt.userData.skinRole='pants';
  const beltBuckle=new THREE.Mesh(new THREE.BoxGeometry(.095,.07,.035),new THREE.MeshStandardMaterial({color:0x6f7478,metalness:.35,roughness:.55}));beltBuckle.position.set(0,.91,.195);runner.add(beltBuckle);
+ const loopMat=new THREE.MeshStandardMaterial({color:0x242a2f,roughness:.9}),beltLoopL=new THREE.Mesh(new THREE.BoxGeometry(.035,.09,.025),loopMat),beltLoopR=beltLoopL.clone();beltLoopL.position.set(-.20,.91,.19);beltLoopR.position.set(.20,.91,.19);runner.add(beltLoopL,beltLoopR);
  const seamMat=new THREE.MeshStandardMaterial({color:0x171b20,roughness:.95}),shirtSeamL=new THREE.Mesh(new THREE.BoxGeometry(.018,.48,.018),seamMat),shirtSeamR=shirtSeamL.clone();shirtSeamL.position.set(-.31,1.26,.29);shirtSeamR.position.set(.31,1.26,.29);runner.add(shirtSeamL,shirtSeamR);
  const shoulders=new THREE.Group();shoulders.position.y=1.48;runner.add(shoulders);
  const armGeo=new THREE.CapsuleGeometry(.125,.50,8,14),armL=new THREE.Mesh(armGeo,skin),armR=armL.clone();
@@ -148,6 +149,7 @@ try{
  const chestMark=new THREE.Mesh(new THREE.BoxGeometry(.12,.045,.018),new THREE.MeshStandardMaterial({color:0x20262b,roughness:.75}));chestMark.position.set(0,.10,.515);torso.add(chestMark);
  const accentMat=new THREE.MeshStandardMaterial({color:0xd7dde0,roughness:.7}),chestAccentL=new THREE.Mesh(new THREE.BoxGeometry(.035,.15,.018),accentMat),chestAccentR=chestAccentL.clone();chestAccentL.position.set(-.12,.02,.514);chestAccentR.position.set(.12,.02,.514);torso.add(chestAccentL,chestAccentR);
  const backPatch=new THREE.Mesh(new THREE.BoxGeometry(.25,.29,.035),new THREE.MeshStandardMaterial({color:0x17202a,roughness:.75}));backPatch.position.set(0,0,-.49);torso.add(backPatch);
+ const spinePanel=new THREE.Mesh(new THREE.BoxGeometry(.10,.30,.022),new THREE.MeshStandardMaterial({color:0x252d34,roughness:.8}));spinePanel.position.set(0,.015,-.52);torso.add(spinePanel);
  const backStripeMat=new THREE.MeshStandardMaterial({color:0x303840,roughness:.78}),backStripeL=new THREE.Mesh(new THREE.BoxGeometry(.045,.34,.018),backStripeMat),backStripeR=backStripeL.clone();backStripeL.position.set(-.15,.02,-.515);backStripeR.position.set(.15,.02,-.515);torso.add(backStripeL,backStripeR);
  const shoulderPanelGeo=new THREE.BoxGeometry(.20,.07,.035),shoulderPanelL=new THREE.Mesh(shoulderPanelGeo,backStripeMat),shoulderPanelR=shoulderPanelL.clone();shoulderPanelL.position.set(-.27,.20,-.48);shoulderPanelR.position.set(.27,.20,-.48);torso.add(shoulderPanelL,shoulderPanelR);
  const legL=new THREE.Mesh(new THREE.CapsuleGeometry(.16,.58,8,14),pants),legR=legL.clone();
