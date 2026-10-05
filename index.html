@@ -96,6 +96,7 @@ try{
  // side structures for depth cues
  box(-19,-18,9,12,4.5,0x5d6467); box(20,-38,11,16,6,0x596168); box(-21,-58,10,14,5.2,0x626a6c);
  const runner=new THREE.Group();runner.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
+ runner.traverse(o=>{if(o.isMesh&&o.geometry&&!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();});
  scene.add(runner);
  const shirt=new THREE.MeshStandardMaterial({color:0x26384b,roughness:.75}), skin=new THREE.MeshStandardMaterial({color:0xc28b6b,roughness:.8}), pants=new THREE.MeshStandardMaterial({color:0x20252b,roughness:.9}),shoeMat=new THREE.MeshStandardMaterial({color:0x111820,roughness:.85}),hairMat=new THREE.MeshStandardMaterial({color:0x30251f,roughness:.95});
  const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.40,.60,14,24),shirt);torso.position.y=1.27;torso.scale.set(1.08,1,.72);torso.castShadow=true;torso.receiveShadow=true;runner.add(torso);
@@ -199,6 +200,7 @@ cargoPocketL.userData.skinRole='pants';cargoPocketR.userData.skinRole='pants';
  runner.position.set(0,0,10);
 // Offline tagger uses the same human model as the four playable runners.
 const bot=runner.clone(true);bot.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
+ bot.traverse(o=>{if(o.isMesh&&o.geometry&&!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();});
  scene.add(bot);bot.position.set(0,0,17);
 const runnerParts=[],botParts=[];runner.traverse(o=>{if(o.isMesh)runnerParts.push(o)});bot.traverse(o=>{if(o.isMesh)botParts.push(o)});
 const botPartOf=src=>botParts[runnerParts.indexOf(src)],botLegL=botPartOf(legL),botLegR=botPartOf(legR),botArmL=botPartOf(armL),botArmR=botPartOf(armR),botTorso=botPartOf(torso);
