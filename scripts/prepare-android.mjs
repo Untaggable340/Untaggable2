@@ -1,27 +1,21 @@
 import{mkdir,copyFile,cp,rm,readFile,writeFile}from'node:fs/promises';
 import{execFileSync}from'node:child_process';
+
 await rm('www',{recursive:true,force:true});
 await mkdir('www/src',{recursive:true});
 await mkdir('www/vendor',{recursive:true});
-for(const f of['index.html','styles.css'])await copyFile(f,'www/'+f);
+for(const file of['index.html','styles.css'])await copyFile(file,'www/'+file);
 await cp('src','www/src',{recursive:true});
 
-// Build a single offline module for Android. Three's final ES-module export
-// statement cannot legally live inside the game's async function, so strip it
-// before inlining and recreate the THREE namespace from the same export list.
-const three=await readFile('node_modules/three/build/three.module.min.js','utf8');
+// Keep Three.js as real ES modules. three.module.min.js imports three.core.min.js,
+// so both files must be present in the offline Android bundle.
+await copyFile('node_modules/three/build/three.module.min.js','www/vendor/three.module.min.js');
+await copyFile('node_modules/three/build/three.core.min.js','www/vendor/three.core.min.js');
+
 let html=await readFile('www/index.html','utf8');
 const dynamicImport='const THREE=await import("./vendor/three.module.min.js");';
 if(!html.includes(dynamicImport))throw new Error('Expected Three.js dynamic import was not found');
-const matches=[...three.matchAll(/export\{([^}]*)\};?/g)];
-const exp=matches.at(-1);
-if(!exp)throw new Error('Three.js export list was not found');
-const exportList=exp[1];
-const threeBody=three.slice(0,exp.index)+three.slice(exp.index+exp[0].length);
-const namespace=exportList.split(',').map(x=>{const p=x.trim().split(/\s+as\s+/);return (p[1]||p[0])+':'+p[0]}).join(',');
-html=html.replace(dynamicImport,threeBody+'\n const THREE={'+namespace+'};');
 
-// A classic-script watchdog still runs if the module has a parse/startup failure.
 const watchdog=`<script>
 window.__untaggableBooted=false;
 window.addEventListener('error',function(e){var l=document.getElementById('loading'),x=document.getElementById('error');if(l)l.style.display='none';if(x){x.textContent='STARTUP ERROR: '+(e.message||'Unknown JavaScript error');x.style.display='flex';}});
@@ -29,25 +23,24 @@ window.addEventListener('unhandledrejection',function(e){var l=document.getEleme
 setTimeout(function(){if(!window.__untaggableBooted){var l=document.getElementById('loading'),x=document.getElementById('error');if(l)l.style.display='none';if(x){x.textContent='STARTUP ERROR: initialization timed out';x.style.display='flex';}}},12000);
 </script>`;
 html=html.replace('<script type="module">',watchdog+'\n<script type="module">');
+
 const bootMarker="}requestAnimationFrame(loop);document.getElementById('loading').style.display='none';";
 if(!html.includes(bootMarker))throw new Error('Game boot completion marker was not found');
 html=html.replace(bootMarker,"}requestAnimationFrame(loop);window.__untaggableBooted=true;document.getElementById('loading').style.display='none';");
 
-// Fail the build instead of shipping another APK with a malformed packaged module.
 const moduleStart='<script type="module">';
 const moduleStartAt=html.indexOf(moduleStart);
 const moduleEndAt=moduleStartAt<0?-1:html.indexOf('</script>',moduleStartAt+moduleStart.length);
-const moduleMatch=moduleStartAt>=0&&moduleEndAt>moduleStartAt?html.slice(moduleStartAt+moduleStart.length,moduleEndAt):null;
-if(!moduleMatch)throw new Error('Packaged game module was not found');
-const packagedModule=moduleMatch;
-// The inlined Three.js source can contain this text in source/debug strings.
-// Verify the actual executable import was replaced by checking that the namespace exists.
-if(!packagedModule.includes('const THREE={'))throw new Error('Packaged Three.js namespace was not created');
+const packagedModule=moduleStartAt>=0&&moduleEndAt>moduleStartAt?html.slice(moduleStartAt+moduleStart.length,moduleEndAt):null;
+if(!packagedModule)throw new Error('Packaged game module was not found');
+if(!packagedModule.includes(dynamicImport))throw new Error('Packaged Three.js import was not preserved');
 if(!html.includes('window.__untaggableBooted=true'))throw new Error('Startup watchdog completion marker was not injected');
+
 const syntaxCheck='www/.untaggable-boot-check.mjs';
 await writeFile(syntaxCheck,packagedModule);
 try{execFileSync(process.execPath,['--check',syntaxCheck],{stdio:'pipe'});}
 catch(err){const details=err.stderr?.toString()||err.stdout?.toString()||err.message;throw new Error('Packaged game module failed syntax validation:\n'+details);}
 finally{await rm(syntaxCheck,{force:true});}
+
 await writeFile('www/index.html',html);
-console.log('Prepared Android assets with valid inlined Three.js and startup diagnostics.');
+console.log('Prepared Android assets with local Three.js modules and startup diagnostics.');
