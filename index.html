@@ -109,6 +109,8 @@ try{
  const hairSideL=new THREE.Mesh(new THREE.CapsuleGeometry(.07,.32,4,8),hairMat),hairSideR=hairSideL.clone();hairSideL.position.set(-.25,1.88,0);hairSideR.position.set(.25,1.88,0);hairSideL.visible=hairSideR.visible=false;runner.add(hairSideL,hairSideR);
  const faceMat=new THREE.MeshStandardMaterial({color:0x20252b,roughness:.75}),eyeGeo=new THREE.SphereGeometry(.032,12,8);
  const eyeL=new THREE.Mesh(eyeGeo,faceMat),eyeR=eyeL.clone();eyeL.position.set(-.09,2.00,.265);eyeR.position.set(.09,2.00,.265);runner.add(eyeL,eyeR);
+ const irisMat=new THREE.MeshStandardMaterial({color:0x5b4636,roughness:.65}),irisGeo=new THREE.SphereGeometry(.017,10,8),irisL=new THREE.Mesh(irisGeo,irisMat),irisR=irisL.clone();irisL.position.set(-.09,2.00,.294);irisR.position.set(.09,2.00,.294);runner.add(irisL,irisR);
+ const pupilMat=new THREE.MeshStandardMaterial({color:0x090b0d,roughness:.55}),pupilGeo=new THREE.SphereGeometry(.008,8,6),pupilL=new THREE.Mesh(pupilGeo,pupilMat),pupilR=pupilL.clone();pupilL.position.set(-.09,2.00,.307);pupilR.position.set(.09,2.00,.307);runner.add(pupilL,pupilR);
  const nose=new THREE.Mesh(new THREE.ConeGeometry(.03,.085,8),new THREE.MeshStandardMaterial({color:0xb9785d,roughness:.8}));nose.rotation.x=Math.PI/2;nose.position.set(0,1.93,.292);runner.add(nose);
  const browGeo=new THREE.BoxGeometry(.075,.018,.014),browL=new THREE.Mesh(browGeo,hairMat),browR=browL.clone();browL.position.set(-.09,2.055,.276);browR.position.set(.09,2.055,.276);browL.rotation.z=-.08;browR.rotation.z=.08;runner.add(browL,browR);
  const mouth=new THREE.Mesh(new THREE.BoxGeometry(.105,.014,.012),new THREE.MeshStandardMaterial({color:0x6b3c38,roughness:.85}));mouth.position.set(0,1.875,.294);runner.add(mouth);
@@ -128,6 +130,7 @@ try{
 const shirtSleeveGeo=new THREE.CylinderGeometry(.145,.135,.20,14),shirtSleeveL=new THREE.Mesh(shirtSleeveGeo,shirt),shirtSleeveR=shirtSleeveL.clone();
  shirtSleeveL.position.set(-.43,1.42,0);shirtSleeveR.position.set(.43,1.42,0);shirtSleeveL.rotation.z=-.08;shirtSleeveR.rotation.z=.08;runner.add(shirtSleeveL,shirtSleeveR);
  shirtSleeveL.userData.skinRole='shirt';shirtSleeveR.userData.skinRole='shirt';
+ const wristMat=new THREE.MeshStandardMaterial({color:0x1b2025,roughness:.8}),wristBandL=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.055,12),wristMat),wristBandR=wristBandL.clone();armL.add(wristBandL);armR.add(wristBandR);wristBandL.position.y=-.28;wristBandR.position.y=-.28;
  const pantCuffGeo=new THREE.CylinderGeometry(.17,.145,.16,14),pantCuffL=new THREE.Mesh(pantCuffGeo,pants),pantCuffR=pantCuffL.clone();
  pantCuffL.position.set(-.17,.19,0);pantCuffR.position.set(.17,.19,0);runner.add(pantCuffL,pantCuffR);pantCuffL.userData.skinRole='pants';pantCuffR.userData.skinRole='pants';
  const cargoMat=pants.clone();
