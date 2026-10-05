@@ -80,6 +80,20 @@ try{
  function clampArena(obj){obj.position.x=Math.max(-arenaHalfX,Math.min(arenaHalfX,obj.position.x));obj.position.z=Math.max(arenaMinZ,Math.min(arenaMaxZ,obj.position.z));}
 
  const obstacles=[];
+// Arena visual pass: pale concrete parkour bowl inspired by the supplied reference, while keeping gameplay collision routes intact.
+const concreteMat=new THREE.MeshStandardMaterial({color:0xb9b8b1,roughness:.96,metalness:0});
+const concreteDark=new THREE.MeshStandardMaterial({color:0x777873,roughness:.98,metalness:0});
+function concreteBlock(x,z,w,d,h,y=0){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),concreteMat);m.position.set(x,y+h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
+function concreteRamp(x,z,w,d,h,ry=0){const g=new THREE.BoxGeometry(w,.32,d),m=new THREE.Mesh(g,concreteMat);m.position.set(x,h*.48,z);m.rotation.set(-Math.atan2(h,d),ry,0);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
+// Raised central sparring/parkour dais with stepped edges.
+concreteBlock(0,18,14,11,.32);concreteBlock(0,18,11.8,8.8,.64);concreteBlock(0,18,9.5,6.6,.96);
+// Architectural perimeter masses and recessed dark openings create the enclosed arena silhouette.
+concreteBlock(-32,24,7,24,5.4);concreteBlock(32,24,7,24,5.4);
+concreteBlock(-28,-6,9,15,4.4);concreteBlock(28,-6,9,15,4.4);
+for(const x of [-30,-10,10,30]){const opening=new THREE.Mesh(new THREE.BoxGeometry(3.4,3.1,.22),concreteDark);opening.position.set(x,1.58,58.88);scene.add(opening)}
+// Sloped approach pieces echo the reference arena's angular ramps.
+concreteRamp(-18,15,7,10,2.2,.08);concreteRamp(18,15,7,10,2.2,-.08);
+
  function box(x,z,w,d,h,color=0x8a7f70,label=''){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,roughness:.85}));m.position.set(x,h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);obstacles.push({mesh:m,x,z,w,d,h,label,climbOnly:label==='CLIMB ONLY'});return m}
  // Height language: low .7-.95, medium 1.2-1.55, tall 2.0+
  box(-6,-8,5,1.2,.75,0xa68b6c,'LOW'); box(5,-14,5,1.4,1.35,0x7c8994,'MEDIUM'); box(-4,-22,6,2,2.25,0x6f756f,'TALL');
