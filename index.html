@@ -443,7 +443,7 @@ canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercan
    }
    roundInfo.textContent='ROUND '+game.round+'/'+game.totalRounds+' • 0:'+String(Math.ceil(game.time)).padStart(2,'0');
    if(game.paused||!game.started||game.between){renderer.render(scene,camera);return;}
-   let ix=state.joyX+(keys.d?1:0)-(keys.a?1:0), iz=state.joyY+(keys.s?1:0)-(keys.w?1:0);if(!game.started||game.between||game.paused){ix=0;iz=0;}let mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;mag=1}
+   let ix=state.joyX+(keys.d?1:0)-(keys.a?1:0), iz=state.joyY+(keys.s?1:0)-(keys.w?1:0);let mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;mag=1}
    if(state.slideTimer>0){state.slideTimer=Math.max(0,state.slideTimer-dt);state.slide=true}else if(!state.crouch)state.slide=false;
    const wantsSprint=(state.sprint||state.autoSprint||keys.shift)&&mag>.12&&state.stamina>0&&!state.crouch;let speed=wantsSprint?7.4:(state.crouch?3.25:5.25);if(state.slide&&mag>.15&&state.stamina>1){speed=state.slideTimer>0?8.15:3.25;state.stamina=Math.max(0,state.stamina-7*dt)}
    if(wantsSprint){state.stamina=Math.max(0,state.stamina-12*dt)}else if(!state.slide){state.stamina=Math.min(150,state.stamina+14*dt)}
