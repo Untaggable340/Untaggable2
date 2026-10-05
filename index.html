@@ -99,6 +99,7 @@ try{
  runner.traverse(o=>{if(o.isMesh&&o.geometry&&!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();});
  runner.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.attributes?.normal==null)o.geometry.computeVertexNormals();});
  runner.traverse(o=>{if(o.isMesh){o.frustumCulled=true;o.matrixAutoUpdate=true;}});
+ runner.traverse(o=>{if(o.isMesh){if(o.userData.skinRole==='hair')o.renderOrder=2;else if(o.userData.skinRole==='skin')o.renderOrder=1;}});
  runner.traverse(o=>{if(o.isMesh&&o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>{if('roughness'in m)m.roughness=Math.max(.42,Math.min(.82,m.roughness??.65));});}});
  scene.add(runner);
  const shirt=new THREE.MeshStandardMaterial({color:0x26384b,roughness:.75}), skin=new THREE.MeshStandardMaterial({color:0xc28b6b,roughness:.8}), pants=new THREE.MeshStandardMaterial({color:0x20252b,roughness:.9}),shoeMat=new THREE.MeshStandardMaterial({color:0x111820,roughness:.85}),hairMat=new THREE.MeshStandardMaterial({color:0x30251f,roughness:.95});
@@ -206,6 +207,7 @@ const bot=runner.clone(true);bot.traverse(o=>{if(o.isMesh){o.castShadow=true;o.r
  bot.traverse(o=>{if(o.isMesh&&o.geometry&&!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();});
  bot.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.attributes?.normal==null)o.geometry.computeVertexNormals();});
  bot.traverse(o=>{if(o.isMesh){o.frustumCulled=true;o.matrixAutoUpdate=true;}});
+ bot.traverse(o=>{if(o.isMesh){if(o.userData.skinRole==='hair')o.renderOrder=2;else if(o.userData.skinRole==='skin')o.renderOrder=1;}});
  bot.traverse(o=>{if(o.isMesh&&o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>{if('roughness'in m)m.roughness=Math.max(.42,Math.min(.82,m.roughness??.65));});}});
  scene.add(bot);bot.position.set(0,0,17);
 const runnerParts=[],botParts=[];runner.traverse(o=>{if(o.isMesh)runnerParts.push(o)});bot.traverse(o=>{if(o.isMesh)botParts.push(o)});
