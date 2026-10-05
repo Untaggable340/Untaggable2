@@ -93,6 +93,15 @@ concreteBlock(-28,-6,9,15,4.4);concreteBlock(28,-6,9,15,4.4);
 for(const x of [-30,-10,10,30]){const opening=new THREE.Mesh(new THREE.BoxGeometry(3.4,3.1,.22),concreteDark);opening.position.set(x,1.58,58.88);scene.add(opening)}
 // Sloped approach pieces echo the reference arena's angular ramps.
 concreteRamp(-18,15,7,10,2.2,.08);concreteRamp(18,15,7,10,2.2,-.08);
+// Reference-inspired stepped circulation and elevated ledges.
+for(let s=0;s<5;s++){concreteBlock(-20+s*1.25,31,1.25,5,.28+s*.28);concreteBlock(20-s*1.25,31,1.25,5,.28+s*.28)}
+concreteBlock(-25,41,12,4,2.1);concreteBlock(25,41,12,4,2.1);
+concreteBlock(0,48,24,3,1.45);
+const arenaPillars=[];for(const x of [-34,-17,0,17,34]){const p=concreteBlock(x,53,2.2,3.2,4.8);arenaPillars.push(p)}
+// Static grime bands and seams break up the clean primitive look without adding texture downloads.
+const seamMat=new THREE.MeshStandardMaterial({color:0x8f908b,roughness:1});
+for(const z of [12,24,36,48]){const seam=new THREE.Mesh(new THREE.BoxGeometry(70,.025,.07),seamMat);seam.position.set(0,.025,z);scene.add(seam)}
+
 
  function box(x,z,w,d,h,color=0x8a7f70,label=''){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,roughness:.85}));m.position.set(x,h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);obstacles.push({mesh:m,x,z,w,d,h,label,climbOnly:label==='CLIMB ONLY'});return m}
  // Height language: low .7-.95, medium 1.2-1.55, tall 2.0+
