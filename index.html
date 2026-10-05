@@ -344,7 +344,7 @@ let sprintPointer=null,slidePointer=null,jid=null;
 function resetRound(){if(roundTransitionTimer!==null){clearTimeout(roundTransitionTimer);roundTransitionTimer=null;}
  Object.keys(keys).forEach(k=>keys[k]=false);
  runner.position.set(0,0,10);state.facing=Math.PI;runner.rotation.y=state.facing;torso.rotation.set(0,0,0);legL.rotation.x=0;legR.rotation.x=0;armL.rotation.x=0;armR.rotation.x=0;runner.scale.y=characterLooks[selectedCharacter].scale[1];state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.joyX=0;state.joyY=0;lookPointer=null;jid=null;sprintPointer=null;slidePointer=null;sprintBtn?.classList.remove('auto','active');slideBtn?.classList.remove('active');knob&&(knob.style.transform='');
- bot.position.set(0,0,17);botState.facing=Math.PI;bot.rotation.y=botState.facing;chooseBotCharacter();botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;botState.actionCooldown=0;botState.slideTimer=0;botState.parkourTimer=0;botState.parkourBoost=0;if(botLegL)botLegL.rotation.x=0;if(botLegR)botLegR.rotation.x=0;if(botArmL)botArmL.rotation.x=0;if(botArmR)botArmR.rotation.x=0;if(botTorso)botTorso.rotation.x=0;
+ bot.position.set(0,0,17);botState.facing=Math.PI;bot.rotation.y=botState.facing;chooseBotCharacter();botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;botState.actionCooldown=0;botState.slideTimer=0;botState.parkourTimer=0;if(botLegL)botLegL.rotation.x=0;if(botLegR)botLegR.rotation.x=0;if(botArmL)botArmL.rotation.x=0;if(botArmR)botArmR.rotation.x=0;if(botTorso)botTorso.rotation.x=0;
  botState.headStart=5;botState.headStartDone=false;botState.headStartShown=null;game.time=60;game.between=false;pauseBtn.style.display=game.offlineBot?'block':'none';cameraHeading=state.facing;movementHeading=state.facing;cameraPitch=.05;
 }
 function finishRound(reason){
@@ -502,7 +502,6 @@ parkourBtn.addEventListener('pointerdown',e=>{if(!e.isPrimary&&e.pointerType==='
    botState.actionCooldown=Math.max(0,botState.actionCooldown-dt);
    botState.slideTimer=Math.max(0,botState.slideTimer-dt);
    botState.parkourTimer=Math.max(0,botState.parkourTimer-dt);
-   if(botState.parkourTimer===0)botState.parkourBoost=0;
    const toPlayer=new THREE.Vector3(runner.position.x-bot.position.x,0,runner.position.z-bot.position.z);
    const dist=toPlayer.length();
    if(dist>.001)toPlayer.normalize();
