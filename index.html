@@ -135,6 +135,12 @@ concreteBlock(0,33,7,2.2,.78);
 concreteBlock(-8,36,3,3,1.75);concreteBlock(8,36,3,3,1.75);
 // Narrow elevated rails visually connect the arena's vertical routes.
 detailSlab(-13,42,10,1.1,.24,capMat,2.62);detailSlab(13,42,10,1.1,.24,capMat,2.62);
+// Arena atmosphere pass: cool concrete lighting, warm overhead fixtures and soft architectural shadows.
+const arenaFill=new THREE.HemisphereLight(0xd8e2e4,0x55564f,.42);scene.add(arenaFill);
+const fixtureMat=new THREE.MeshStandardMaterial({color:0xe8dfc7,emissive:0xd7b879,emissiveIntensity:.7,roughness:.5});
+for(const x of [-28,-14,0,14,28]){const fixture=new THREE.Mesh(new THREE.BoxGeometry(2.4,.12,.5),fixtureMat);fixture.position.set(x,5.7,55);fixture.rotation.x=.18;scene.add(fixture)}
+const shadowBandMat=new THREE.MeshStandardMaterial({color:0x5f625e,roughness:1});
+for(const x of [-32,32]){const band=new THREE.Mesh(new THREE.BoxGeometry(6.2,.16,16),shadowBandMat);band.position.set(x,.09,24);band.rotation.y=x<0?.08:-.08;scene.add(band)}
 
 // Thin dark strips visually mark ledge lips so jumps remain readable on small mobile screens.
 for(const x of [-26,-20,-14,14,20,26]){const lip=new THREE.Mesh(new THREE.BoxGeometry(5.3,.045,.10),concreteDark);lip.position.set(x,x<0?(.02*x-.15):(.02*x-.43),-0.0);lip.visible=false;scene.add(lip)}
