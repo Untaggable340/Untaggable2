@@ -1,4 +1,5 @@
 import{mkdir,copyFile,cp,rm,readFile,writeFile}from'node:fs/promises';
+import{execFileSync}from'node:child_process';
 await rm('www',{recursive:true,force:true});
 await mkdir('www/src',{recursive:true});
 await mkdir('www/vendor',{recursive:true});
@@ -43,5 +44,10 @@ const packagedModule=moduleMatch;
 // Verify the actual executable import was replaced by checking that the namespace exists.
 if(!packagedModule.includes('const THREE={'))throw new Error('Packaged Three.js namespace was not created');
 if(!html.includes('window.__untaggableBooted=true'))throw new Error('Startup watchdog completion marker was not injected');
+const syntaxCheck='www/.untaggable-boot-check.mjs';
+await writeFile(syntaxCheck,packagedModule);
+try{execFileSync(process.execPath,['--check',syntaxCheck],{stdio:'pipe'});}
+catch(err){const details=err.stderr?.toString()||err.stdout?.toString()||err.message;throw new Error('Packaged game module failed syntax validation:\n'+details);}
+finally{await rm(syntaxCheck,{force:true});}
 await writeFile('www/index.html',html);
 console.log('Prepared Android assets with valid inlined Three.js and startup diagnostics.');
