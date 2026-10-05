@@ -500,6 +500,7 @@ document.getElementById('jump').addEventListener('pointerdown',jump);document.ge
    botState.actionCooldown=Math.max(0,botState.actionCooldown-dt);
    botState.slideTimer=Math.max(0,botState.slideTimer-dt);
    botState.parkourTimer=Math.max(0,botState.parkourTimer-dt);
+   if(botState.parkourTimer===0)botState.parkourBoost=0;
    const toPlayer=new THREE.Vector3(runner.position.x-bot.position.x,0,runner.position.z-bot.position.z);
    const dist=toPlayer.length();
    if(dist>.001)toPlayer.normalize();
