@@ -88,7 +88,8 @@ try{
  // CLIMB ONLY: these tops are deliberately above normal jump/vault reach.
  box(8,-64,5,5,2.85,0x4f6878,'CLIMB ONLY'); box(-7,-72,6,5,3.15,0x4f6878,'CLIMB ONLY');
  // Slide/crouch lane: overhead beams leave a low opening beneath them.
- function overhead(x,z,w,d,bottom,h=.42){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:0x394b56,roughness:.82}));m.position.set(x,bottom+h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
+ const overheads=[];
+ function overhead(x,z,w,d,bottom,h=.42){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:0x394b56,roughness:.82}));m.position.set(x,bottom+h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);overheads.push({mesh:m,x,z,w,d,bottom,h});return m}
  overhead(-14,2,6,1.8,1.28);overhead(-14,-3,6,1.8,1.18);overhead(-14,-8,6,1.8,1.34);
  // Gap-jump route: raised pads are spaced so a committed jump can cross each gap.
  box(15,4,5,5,1.05,0x667985,'GAP PAD');box(15,-3.4,5,5,1.05,0x667985,'GAP PAD');box(15,-10.8,5,5,1.05,0x667985,'GAP PAD');
@@ -119,6 +120,8 @@ try{
  runner.position.set(0,0,10);
 // Offline tagger uses the same human model as the four playable runners.
 const bot=runner.clone(true);scene.add(bot);bot.position.set(0,0,17);
+const runnerParts=[],botParts=[];runner.traverse(o=>{if(o.isMesh)runnerParts.push(o)});bot.traverse(o=>{if(o.isMesh)botParts.push(o)});
+const botPartOf=src=>botParts[runnerParts.indexOf(src)],botLegL=botPartOf(legL),botLegR=botPartOf(legR),botArmL=botPartOf(armL),botArmR=botPartOf(armR),botTorso=botPartOf(torso);
 let botCharacter='Gwen';
 function applyBotCharacter(name){
  botCharacter=name;const l=characterLooks[name];
@@ -224,7 +227,7 @@ function surfaceAt(x,z,currentY,descending){
 function blocked(nx,nz){
   const radius=.30, feet=runner.position.y;
   // Overhead gates only block an upright runner; crouching/sliding passes underneath.
-  if(!state.crouch&&!state.slide){for(const g of [{x:-14,z:2,w:6,d:1.8},{x:-14,z:-3,w:6,d:1.8},{x:-14,z:-8,w:6,d:1.8}]){if(nx>g.x-g.w/2-radius&&nx<g.x+g.w/2+radius&&nz>g.z-g.d/2-radius&&nz<g.z+g.d/2+radius)return true;}}
+  if(!state.crouch&&!state.slide){for(const g of overheads){if(nx>g.x-g.w/2-radius&&nx<g.x+g.w/2+radius&&nz>g.z-g.d/2-radius&&nz<g.z+g.d/2+radius)return true;}}
 
   for(const o of obstacles){
     if(!insideXZ(o,nx,nz,radius))continue;
@@ -317,6 +320,10 @@ document.getElementById('jump').addEventListener('pointerdown',jump);document.ge
    }
    const bx=bot.position.x+move.x*speed*dt,bz=bot.position.z+move.z*speed*dt;
    let blockedX=false,blockedZ=false;
+   for(const g of overheads){
+     if(botInside(g,bx,bot.position.z,.30)&&bot.position.y<g.bottom)blockedX=true;
+     if(botInside(g,bot.position.x,bz,.30)&&bot.position.y<g.bottom)blockedZ=true;
+   }
    for(const o of obstacles){
      if(botInside(o,bx,bot.position.z,.30)&&bot.position.y<o.h-.16&&botState.parkourTimer<=0)blockedX=true;
      if(botInside(o,bot.position.x,bz,.30)&&bot.position.y<o.h-.16&&botState.parkourTimer<=0)blockedZ=true;
@@ -335,7 +342,10 @@ document.getElementById('jump').addEventListener('pointerdown',jump);document.ge
      else{botState.onGround=false;botState.support=null;botState.yVel=0}
    }else bot.position.y=0;
 
-   // Bot uses the same full human silhouette; locomotion pose refinement shares the runner animation system next.
+   const moving=dist>.8,phase=now*.012*(wantsSprint?1.35:1),bstep=moving?Math.sin(phase):0;
+   if(botLegL&&botLegR){botLegL.rotation.x=bstep*(wantsSprint?.72:.50);botLegR.rotation.x=-bstep*(wantsSprint?.72:.50)}
+   if(botArmL&&botArmR){botArmL.rotation.x=-bstep*(wantsSprint?.66:.44);botArmR.rotation.x=bstep*(wantsSprint?.66:.44)}
+   if(botTorso)botTorso.rotation.x=moving?(wantsSprint?.11:.045):0;
 
    // A simple tag event for this prototype; reset the bot behind you so testing can continue.
    if(dist<.78&&Math.abs(bot.position.y-runner.position.y)<1.25){
