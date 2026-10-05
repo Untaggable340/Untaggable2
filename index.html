@@ -95,18 +95,7 @@ try{
  box(15,4,5,5,1.05,0x667985,'GAP PAD');box(15,-3.4,5,5,1.05,0x667985,'GAP PAD');box(15,-10.8,5,5,1.05,0x667985,'GAP PAD');
  // side structures for depth cues
  box(-19,-18,9,12,4.5,0x5d6467); box(20,-38,11,16,6,0x596168); box(-21,-58,10,14,5.2,0x626a6c);
- const runner=new THREE.Group();runner.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
- runner.traverse(o=>{if(o.isMesh&&o.geometry&&!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();});
- runner.traverse(o=>{if(o.isMesh&&o.geometry&&o.geometry.attributes?.normal==null)o.geometry.computeVertexNormals();});
- runner.traverse(o=>{if(o.isMesh){o.frustumCulled=true;o.matrixAutoUpdate=true;}});
- runner.traverse(o=>{if(o.isMesh){if(o.userData.skinRole==='hair')o.renderOrder=2;else if(o.userData.skinRole==='skin')o.renderOrder=1;}});
- runner.traverse(o=>{if(o.isMesh&&o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>{m.depthTest=true;m.depthWrite=true;});}});
- runner.traverse(o=>{if(o.isMesh&&o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>{m.side=THREE.FrontSide;});}});
- runner.traverse(o=>{if(o.isMesh&&o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>{if(m.transparent&&m.opacity>=.999)m.transparent=false;});}});
- runner.updateMatrixWorld(true);
- runner.traverse(o=>{if(o.isMesh&&o.geometry){o.geometry.computeBoundingBox();}});
- runner.traverse(o=>{if(o.isMesh&&o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>{if('roughness'in m)m.roughness=Math.max(.42,Math.min(.82,m.roughness??.65));});}});
- scene.add(runner);
+ const runner=new THREE.Group();  
  const shirt=new THREE.MeshStandardMaterial({color:0x26384b,roughness:.75}), skin=new THREE.MeshStandardMaterial({color:0xc28b6b,roughness:.8}), pants=new THREE.MeshStandardMaterial({color:0x20252b,roughness:.9}),shoeMat=new THREE.MeshStandardMaterial({color:0x111820,roughness:.85}),hairMat=new THREE.MeshStandardMaterial({color:0x30251f,roughness:.95});
  const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.40,.60,14,24),shirt);torso.position.y=1.27;torso.scale.set(1.08,1,.72);torso.castShadow=true;torso.receiveShadow=true;runner.add(torso);
  const upperChest=new THREE.Mesh(new THREE.CapsuleGeometry(.32,.18,8,14),shirt);
@@ -206,7 +195,7 @@ cargoPocketL.userData.skinRole='pants';cargoPocketR.userData.skinRole='pants';
  [neck,head,armL,armR,handL,handR].forEach(m=>m.userData.skinRole='skin');[torso,chest,waist].forEach(m=>m.userData.skinRole='shirt');[pelvis,legL,legR].forEach(m=>m.userData.skinRole='pants');[hair,hairTop,hairCrownL,hairCrownR,hairFringeL,hairFringeR,hairBack,hairBackL,hairBackR,hairSideL,hairSideR].forEach(m=>m.userData.skinRole='hair');
  hair.userData.hairPart='cap';hairTop.userData.hairPart='top';hairCrownL.userData.hairPart='crownL';hairCrownR.userData.hairPart='crownR';hairFringeL.userData.hairPart='fringeL';hairFringeR.userData.hairPart='fringeR';hairBack.userData.hairPart='back';hairBackL.userData.hairPart='backL';hairBackR.userData.hairPart='backR';hairSideL.userData.hairPart='sideL';hairSideR.userData.hairPart='sideR';[shoeL,shoeR].forEach(m=>m.userData.skinRole='shoe');
  runner.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});
- runner.position.set(0,0,10);
+ runner.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;if(o.geometry&&!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();if(o.geometry&&o.geometry.attributes?.normal==null)o.geometry.computeVertexNormals();o.frustumCulled=true;o.matrixAutoUpdate=true;if(o.userData.skinRole==='hair')o.renderOrder=2;else if(o.userData.skinRole==='skin')o.renderOrder=1;if(o.geometry)o.geometry.computeBoundingBox();if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>{m.depthTest=true;m.depthWrite=true;m.side=THREE.FrontSide;if(m.transparent&&m.opacity>=.999)m.transparent=false;if('roughness'in m)m.roughness=Math.max(.42,Math.min(.82,m.roughness??.65));});}}});runner.updateMatrixWorld(true);scene.add(runner);  runner.position.set(0,0,10);
 // Offline tagger uses the same human model as the four playable runners.
 const bot=runner.clone(true);bot.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
  bot.traverse(o=>{if(o.isMesh&&o.geometry&&!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();});
