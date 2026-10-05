@@ -133,12 +133,12 @@ function chooseBotCharacter(){const choices=charNames.filter(n=>n!==selectedChar
 const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,actionCooldown:0,slideTimer:0,parkourTimer:0,headStart:5,headStartDone:false};
  const state={vel:new THREE.Vector3(),yVel:0,onGround:true,stamina:150,sprint:false,slide:false,parkourBoost:0,parkourTimer:0,facing:Math.PI,joyX:0,joyY:0,support:null,autoSprint:false,lastSprintTap:0,crouch:false,slideTimer:0};
  const keys={}; let last=performance.now();
-let game={started:false,totalRounds:1,round:1,time:45,between:false,paused:false,offlineBot:true};
+let game={started:false,totalRounds:1,round:1,time:60,between:false,paused:false,offlineBot:true};
 let cameraHeading=Math.PI,movementHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
 function resetRound(){
  runner.position.set(0,0,10);state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;
  bot.position.set(0,0,17);chooseBotCharacter();botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;
- botState.headStart=5;botState.headStartDone=false;game.time=45;game.between=false;cameraHeading=state.facing;movementHeading=state.facing;cameraPitch=.05;
+ botState.headStart=5;botState.headStartDone=false;game.time=60;game.between=false;cameraHeading=state.facing;movementHeading=state.facing;cameraPitch=.05;
 }
 function finishRound(reason){
  if(game.between)return;game.between=true;
@@ -176,7 +176,7 @@ document.getElementById('restartGame').addEventListener('click',()=>{
 });
 document.getElementById('mainMenuBtn').addEventListener('click',()=>{
  game.paused=false;game.started=false;game.between=false;state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.crouch=false;state.slide=false;sprintBtn?.classList.remove('auto','active');pauseMenu.style.display='none';pauseBtn.style.display='none';
- document.getElementById('menu').style.display='flex';game.round=1;game.time=45;
+ document.getElementById('menu').style.display='flex';game.round=1;game.time=60;
 });
 document.getElementById('startGame').addEventListener('click',()=>{
  game.round=1;game.started=true;game.paused=false;document.getElementById('menu').style.display='none';
