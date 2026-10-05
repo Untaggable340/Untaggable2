@@ -574,7 +574,7 @@ document.getElementById('jump').addEventListener('pointerdown',jump);document.ge
  }
  // Right-side free-look: ignore touches that begin on action buttons or joystick.
 canvas.addEventListener('pointerdown',e=>{
- if(e.clientX<innerWidth*.45||!game.started||game.paused||game.between)return;
+ if(e.clientX<innerWidth*.45||!game.started||game.paused||game.between||lookPointer!==null)return;
  lookPointer=e.pointerId;lookLastX=e.clientX;lookLastY=e.clientY;canvas.setPointerCapture(e.pointerId);
 });
 canvas.addEventListener('pointermove',e=>{
