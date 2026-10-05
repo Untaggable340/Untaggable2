@@ -25,11 +25,23 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0d1117;col
 @media(orientation:portrait) and (max-width:900px){#rotate{display:flex}}
 @media(max-height:500px){#buttons{transform:scale(.9);transform-origin:right bottom}#joy{transform:scale(.9);transform-origin:left bottom}.hint{display:none}}
 .btn.auto{background:rgba(255,255,255,.34)!important;border-color:rgba(255,255,255,.95)!important;box-shadow:0 0 16px rgba(255,255,255,.42),inset 0 0 12px rgba(255,255,255,.16)}
-#menu{position:fixed;inset:0;z-index:45;background:rgba(13,17,23,.94);display:flex;align-items:center;justify-content:center;pointer-events:auto}
-#menuCard{width:min(420px,82vw);text-align:center;padding:24px;border:1px solid rgba(255,255,255,.18);border-radius:18px;background:rgba(25,33,43,.96)}
-#menuCard h2{margin:0 0 8px;font-size:27px}#menuCard p{opacity:.72;font-size:13px;margin:0 0 18px}
-.roundChoices{display:flex;gap:10px;justify-content:center}.roundChoice{min-width:86px;padding:13px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-weight:900;font-size:15px}
-.roundChoice.selected{background:rgba(255,255,255,.26);border-color:#fff}#startGame{margin-top:18px;padding:13px 30px;border:0;border-radius:12px;font-weight:900;font-size:16px}
+#menu{position:fixed;inset:0;z-index:45;display:flex;align-items:stretch;justify-content:flex-start;pointer-events:auto;overflow:hidden;background:linear-gradient(90deg,rgba(7,12,18,.97) 0%,rgba(11,19,27,.88) 45%,rgba(11,19,27,.28) 76%,rgba(11,19,27,.08) 100%)}
+#menu:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,12,18,.08),rgba(7,12,18,.52));pointer-events:none}
+#menuCard{position:relative;z-index:2;width:min(520px,58vw);padding:clamp(22px,4vw,54px);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left;background:none;border:0}
+.menuKicker{font-size:11px;font-weight:900;letter-spacing:.32em;color:#9fb2c3;margin-bottom:5px}
+#menuCard h2{margin:0;font-size:clamp(42px,7vw,76px);line-height:.9;letter-spacing:-.055em;text-shadow:0 5px 20px #000}
+#menuCard p{opacity:.72;font-size:12px;margin:12px 0 14px;letter-spacing:.08em}
+#startGame{order:2;margin:14px 0 13px;min-width:220px;padding:15px 34px;border:0;border-radius:5px;background:#eef2f4;color:#101820;font-weight:1000;font-size:21px;letter-spacing:.08em;transform:skew(-5deg);box-shadow:0 7px 22px rgba(0,0,0,.35)}
+#startGame span{display:block;transform:skew(5deg)}
+.menuLabel{font-size:9px;font-weight:900;letter-spacing:.2em;opacity:.58;margin:4px 0 7px}
+.characterChoices{display:flex;gap:8px;flex-wrap:wrap}
+.characterChoice{width:78px;padding:8px 5px 7px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(20,29,39,.76);color:#fff;font-weight:900;font-size:10px;text-align:center}
+.characterChoice .avatar{width:42px;height:42px;margin:0 auto 5px;border-radius:50%;display:grid;place-items:center;font-size:21px;background:linear-gradient(145deg,#33495c,#17232e);border:2px solid rgba(255,255,255,.22)}
+.characterChoice.selected{border-color:#fff;background:rgba(255,255,255,.18);box-shadow:0 0 0 2px rgba(255,255,255,.08)}
+.roundChoices{display:flex;gap:7px}.roundChoice{padding:9px 13px;border-radius:5px;border:1px solid rgba(255,255,255,.2);background:rgba(18,27,36,.7);color:#fff;font-weight:900;font-size:11px}
+.roundChoice.selected{background:#dce3e8;color:#101820;border-color:#fff}
+.menuFoot{font-size:9px;opacity:.42;letter-spacing:.14em;margin-top:8px}
+@media(max-height:500px){#menuCard{padding:18px 34px;width:min(560px,65vw)}#menuCard h2{font-size:44px}.characterChoice{width:66px;padding:5px}.characterChoice .avatar{width:32px;height:32px;font-size:17px}#startGame{padding:11px 28px;margin:9px 0;font-size:17px}.menuLabel{margin:2px 0 5px}}
 #pauseBtn{pointer-events:auto;position:absolute;right:max(18px,env(safe-area-inset-right));top:52px;width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.3);background:rgba(13,17,23,.58);color:#fff;font-size:20px;font-weight:900;display:none}
 #pauseMenu{position:fixed;inset:0;z-index:46;background:rgba(7,10,14,.78);display:none;align-items:center;justify-content:center;pointer-events:auto}
 #pauseCard{width:min(330px,76vw);padding:22px;border-radius:18px;background:rgba(25,33,43,.97);border:1px solid rgba(255,255,255,.18);text-align:center}
@@ -41,7 +53,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0d1117;col
 <body>
 <div id="loading">BUILDING TRAINING GROUNDS…</div><div id="error">3D engine could not load. This prototype needs an internet connection the first time it opens.</div>
 <canvas id="game"></canvas>
-<div id="menu"><div id="menuCard"><h2>UNTAGGABLE</h2><p>Choose how many 45-second rounds to play.</p><div class="roundChoices"><button class="roundChoice selected" data-rounds="1">1 ROUND</button><button class="roundChoice" data-rounds="3">3 ROUNDS</button><button class="roundChoice" data-rounds="5">5 ROUNDS</button></div><button id="startGame">START GAME</button></div></div>
+<div id="menu"><div id="menuCard"><div class="menuKicker">PARKOUR • CHASE • SURVIVE</div><h2>UNTAGGABLE</h2><p>TRAINING GROUNDS // OFFLINE TAG</p><div class="menuLabel">CHOOSE RUNNER</div><div class="characterChoices"><button class="characterChoice selected" data-character="Finn"><span class="avatar">F</span>FINN</button><button class="characterChoice" data-character="Gwen"><span class="avatar">G</span>GWEN</button><button class="characterChoice" data-character="Trinity"><span class="avatar">T</span>TRINITY</button><button class="characterChoice" data-character="Owen"><span class="avatar">O</span>OWEN</button></div><div class="menuLabel">ROUNDS</div><div class="roundChoices"><button class="roundChoice selected" data-rounds="1">1 ROUND</button><button class="roundChoice" data-rounds="3">3 ROUNDS</button><button class="roundChoice" data-rounds="5">5 ROUNDS</button></div><button id="startGame"><span>▶ PLAY</span></button><div class="menuFoot">RUN. VAULT. CLIMB. DON'T GET TAGGED.</div></div></div>
 <div id="pauseMenu"><div id="pauseCard"><h2>PAUSED</h2><button class="pauseAction" id="resumeGame">RESUME</button><button class="pauseAction" id="restartGame">RESTART MATCH</button><button class="pauseAction" id="mainMenuBtn">MAIN MENU</button></div></div>
 <div id="hud">
  <div id="top"><div><div id="role">RUNNER • 3D TEST</div><div id="stamWrap"><div id="stam"></div></div><div class="small">TRAINING GROUNDS • SKILL PARKOUR</div></div><div class="hint">Low obstacle: JUMP or PARKOUR<br>Medium obstacle: PARKOUR<br>Tall ledge: JUMP + PARKOUR</div></div>
@@ -127,6 +139,11 @@ function finishRound(reason){
    setTimeout(()=>resetRound(),900);
  }
 }
+const characterLooks={Finn:{skin:0xc28b6b,shirt:0x26384b,pants:0x20252b},Gwen:{skin:0x704936,shirt:0x6b355f,pants:0x24232a},Trinity:{skin:0xd3a07f,shirt:0x416b63,pants:0x292b31},Owen:{skin:0x65402f,shirt:0x8a5a32,pants:0x20252b}};
+let selectedCharacter='Finn';
+function applyCharacter(name){selectedCharacter=name;const l=characterLooks[name];skin.color.setHex(l.skin);shirt.color.setHex(l.shirt);pants.color.setHex(l.pants);document.querySelectorAll('.characterChoice').forEach(b=>b.classList.toggle('selected',b.dataset.character===name));}
+document.querySelectorAll('.characterChoice').forEach(b=>b.addEventListener('click',()=>applyCharacter(b.dataset.character)));
+applyCharacter('Finn');
 const roundInfo=document.getElementById('roundInfo');
 document.querySelectorAll('.roundChoice').forEach(b=>b.addEventListener('click',()=>{
  document.querySelectorAll('.roundChoice').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');game.totalRounds=Number(b.dataset.rounds);
