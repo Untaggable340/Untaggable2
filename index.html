@@ -77,7 +77,11 @@ window.__untaggableBootStage='page';
 })();
 </script>
 <script type="module">
-(async()=>{\ntry{\n window.__untaggableBootStage="three-import";\n const THREE=await import("./vendor/three.module.min.js");\n window.__untaggableBootStage="renderer";
+(async()=>{
+try{
+ window.__untaggableBootStage="three-import";
+ const THREE=await import("./vendor/three.module.min.js");
+ window.__untaggableBootStage="renderer";
  const canvas=document.getElementById('game'),stamEl=document.getElementById('stam');
  const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  const MAX_RENDER_W=1920,MAX_RENDER_H=1080;
