@@ -453,8 +453,9 @@ function blocked(nx,nz){
  const joy=document.getElementById('joy'),knob=document.getElementById('knob');let jid=null;function joySet(e){const r=joy.getBoundingClientRect();let x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2,m=Math.hypot(x,y),lim=43;if(m>lim){x*=lim/m;y*=lim/m}let nx=x/lim,ny=y/lim;const dead=.025,raw=Math.hypot(nx,ny);if(raw<dead){nx=0;ny=0}else{const scaled=Math.pow((raw-dead)/(1-dead),.82),s=scaled/raw;nx*=s;ny*=s}state.joyX=nx;state.joyY=ny;knob.style.transform=`translate(${x}px,${y}px)`}joy.addEventListener('pointerdown',e=>{if(!game.started||game.paused||game.between)return;jid=e.pointerId;joy.setPointerCapture(jid);joySet(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===jid)joySet(e)});function jend(e){if(e.pointerId===jid){jid=null;state.joyX=state.joyY=0;knob.style.transform=''}}joy.addEventListener('pointerup',jend);joy.addEventListener('pointercancel',jend);joy.addEventListener('lostpointercapture',jend);
  function hold(id,key){const el=document.getElementById(id);let activePointer=null;el.addEventListener('pointerdown',e=>{if(!game.started||game.paused||game.between||activePointer!==null)return;activePointer=e.pointerId;state[key]=true;el.classList.add('active');el.setPointerCapture(e.pointerId)});const up=e=>{if(activePointer!==null&&e.pointerId!==activePointer)return;activePointer=null;state[key]=false;el.classList.remove('active')};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('lostpointercapture',up)}
 const sprintBtn=document.getElementById('sprint');
+let sprintPointer=null;
 sprintBtn.addEventListener('pointerdown',e=>{
- if(!game.started||game.paused||game.between)return;
+ if(!game.started||game.paused||game.between||sprintPointer!==null)return;
  const now=performance.now();
  if(state.autoSprint){
    state.autoSprint=false;state.sprint=false;state.lastSprintTap=0;
@@ -464,11 +465,9 @@ sprintBtn.addEventListener('pointerdown',e=>{
    state.autoSprint=true;state.sprint=false;state.lastSprintTap=0;
    sprintBtn.classList.add('auto');toast('AUTO SPRINT ON');
  }else{
-   state.sprint=true;state.lastSprintTap=now;sprintBtn.classList.add('active');
+   sprintPointer=e.pointerId;state.sprint=true;state.lastSprintTap=now;sprintBtn.classList.add('active');sprintBtn.setPointerCapture(e.pointerId);
  }
 });
-let sprintPointer=null;
-sprintBtn.addEventListener('pointerdown',e=>{if(state.sprint&&!state.autoSprint)sprintPointer=e.pointerId},{capture:true});
 const sprintRelease=e=>{if(sprintPointer!==null&&e.pointerId!==sprintPointer)return;sprintPointer=null;state.sprint=false;sprintBtn.classList.remove('active')};
 sprintBtn.addEventListener('pointerup',sprintRelease);sprintBtn.addEventListener('pointercancel',sprintRelease);sprintBtn.addEventListener('lostpointercapture',sprintRelease);
 const slideBtn=document.getElementById('slide');
