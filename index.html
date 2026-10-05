@@ -290,7 +290,7 @@ document.getElementById('startGame').addEventListener('click',()=>{
 });
 
  const toastEl=document.getElementById('toast');function toast(t){toastEl.textContent=t;toastEl.style.opacity=1;clearTimeout(toastEl._t);toastEl._t=setTimeout(()=>toastEl.style.opacity=0,650)}
- function jump(){if(!game.started||game.paused||game.between)return;if(state.onGround&&state.stamina>=5){state.yVel=6.7;state.onGround=false;state.support=null;state.stamina-=5;toast('JUMP')}}
+ function jump(){if(!game.started||game.paused||game.between)return;if(state.onGround){const full=state.stamina>=5;state.yVel=full?6.7:5.75;state.onGround=false;state.support=null;if(full)state.stamina=Math.max(0,state.stamina-5);toast(full?'JUMP':'EXHAUSTED JUMP')}}
  function parkour(){
   if(!game.started||game.paused||game.between)return;
   if(state.stamina<8)return;
