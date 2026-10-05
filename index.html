@@ -116,18 +116,20 @@ try{
  const legL=new THREE.Mesh(new THREE.CapsuleGeometry(.145,.56,6,10),pants),legR=legL.clone();legL.position.set(-.17,.49,0);legR.position.set(.17,.49,0);runner.add(legL,legR);
  const shoeGeo=new THREE.BoxGeometry(.25,.17,.42),shoeL=new THREE.Mesh(shoeGeo,shoeMat),shoeR=shoeL.clone();shoeL.position.set(-.17,.09,.07);shoeR.position.set(.17,.09,.07);runner.add(shoeL,shoeR);
  runner.position.set(0,0,10);
-// First tagger bot — same simple body language as the runner, visually red so roles are obvious.
-const bot=new THREE.Group();scene.add(bot);
-const botShirt=new THREE.MeshStandardMaterial({color:0x7a2630,roughness:.75});
-const botSkin=new THREE.MeshStandardMaterial({color:0x9f7058,roughness:.8});
-const botPants=new THREE.MeshStandardMaterial({color:0x25272b,roughness:.9});
-const botTorso=new THREE.Mesh(new THREE.CapsuleGeometry(.36,.72,6,10),botShirt);botTorso.position.y=1.15;bot.add(botTorso);
-const botHead=new THREE.Mesh(new THREE.SphereGeometry(.29,16,12),botSkin);botHead.position.y=1.92;bot.add(botHead);
-const botLegL=new THREE.Mesh(new THREE.CapsuleGeometry(.12,.62,4,8),botPants),botLegR=botLegL.clone();
-botLegL.position.set(-.18,.48,0);botLegR.position.set(.18,.48,0);bot.add(botLegL,botLegR);
-const botFront=new THREE.Mesh(new THREE.BoxGeometry(.20,.28,.035),new THREE.MeshStandardMaterial({color:0xf0d7d7,roughness:.7}));
-botFront.position.set(0,1.20,.37);bot.add(botFront);
-bot.position.set(0,0,17);
+// Offline tagger uses the same human model as the four playable runners.
+const bot=runner.clone(true);scene.add(bot);bot.position.set(0,0,17);
+let botCharacter='Gwen';
+function applyBotCharacter(name){
+ botCharacter=name;const l=characterLooks[name];
+ // Clone materials first so changing the bot never recolors the runner.
+ bot.traverse(o=>{if(o.isMesh&&o.material)o.material=o.material.clone()});
+ const meshes=[];bot.traverse(o=>{if(o.isMesh)meshes.push(o)});
+ // Mirror runner material roles by source material colors/names through geometry order.
+ const source=[];runner.traverse(o=>{if(o.isMesh)source.push(o)});
+ meshes.forEach((m,i)=>{const s=source[i];if(!s)return;const hex=s.material.color?.getHex();if(hex===skin.color.getHex())m.material.color.setHex(l.skin);else if(hex===shirt.color.getHex())m.material.color.setHex(l.shirt);else if(hex===pants.color.getHex())m.material.color.setHex(l.pants);else if(hex===hairMat.color.getHex())m.material.color.setHex(l.hair);else if(hex===shoeMat.color.getHex())m.material.color.setHex(l.shoe)});
+ bot.scale.set(...l.scale);
+}
+function chooseBotCharacter(){const choices=charNames.filter(n=>n!==selectedCharacter);applyBotCharacter(choices[Math.floor(Math.random()*choices.length)]);}
 const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,actionCooldown:0,slideTimer:0,parkourTimer:0,headStart:5,headStartDone:false};
  const state={vel:new THREE.Vector3(),yVel:0,onGround:true,stamina:150,sprint:false,slide:false,parkourBoost:0,parkourTimer:0,facing:Math.PI,joyX:0,joyY:0,support:null,autoSprint:false,lastSprintTap:0,crouch:false,slideTimer:0};
  const keys={}; let last=performance.now();
@@ -135,7 +137,7 @@ let game={started:false,totalRounds:1,round:1,time:45,between:false,paused:false
 let cameraHeading=Math.PI,movementHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
 function resetRound(){
  runner.position.set(0,0,10);state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;
- bot.position.set(0,0,17);botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;
+ bot.position.set(0,0,17);chooseBotCharacter();botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;
  botState.headStart=5;botState.headStartDone=false;game.time=45;game.between=false;cameraHeading=state.facing;movementHeading=state.facing;cameraPitch=.05;
 }
 function finishRound(reason){
@@ -333,8 +335,7 @@ document.getElementById('jump').addEventListener('pointerdown',jump);document.ge
      else{botState.onGround=false;botState.support=null;botState.yVel=0}
    }else bot.position.y=0;
 
-   const moving=dist>.8,phase=now*.012*(wantsSprint?1.35:1);
-   botLegL.rotation.x=moving?Math.sin(phase)*.55:0;botLegR.rotation.x=moving?-Math.sin(phase)*.55:0;
+   // Bot uses the same full human silhouette; locomotion pose refinement shares the runner animation system next.
 
    // A simple tag event for this prototype; reset the bot behind you so testing can continue.
    if(dist<.78&&Math.abs(bot.position.y-runner.position.y)<1.25){
@@ -463,7 +464,9 @@ canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercan
    else shoulders.rotation.x=0;
    if(crouching){runner.scale.y=.72;torso.rotation.x=.18;legL.rotation.x=.42;legR.rotation.x=.42;armL.rotation.x=-.28;armR.rotation.x=-.28;}
    else if(sliding){runner.scale.y=.62;torso.rotation.x=.55;torso.rotation.z=.08;legL.rotation.x=1.0;legR.rotation.x=.62;armL.rotation.x=-.58;armR.rotation.x=-.30;}
-   else runner.scale.y=1;
+   else runner.scale.y=characterLooks[selectedCharacter].scale[1];
+   if(crouching)runner.scale.y=characterLooks[selectedCharacter].scale[1]*.72;
+   else if(sliding)runner.scale.y=characterLooks[selectedCharacter].scale[1]*.62;
    if(state.parkourTimer>0){torso.rotation.x=-.18;armL.rotation.x=-1.15;armR.rotation.x=-1.15;legL.rotation.x=.55;legR.rotation.x=-.18;}
    updateBot(dt,now);
    // Free-look camera: right-thumb camera movement does not directly steer the runner.
