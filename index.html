@@ -87,6 +87,11 @@ try{
  box(12,-51,7,1.5,.8,0x9c8b72,'LOW'); box(-1,-58,4,4,1.35,0x7d8b90,'MEDIUM');
  // CLIMB ONLY: these tops are deliberately above normal jump/vault reach.
  box(8,-64,5,5,2.85,0x4f6878,'CLIMB ONLY'); box(-7,-72,6,5,3.15,0x4f6878,'CLIMB ONLY');
+ // Slide/crouch lane: overhead beams leave a low opening beneath them.
+ function overhead(x,z,w,d,bottom,h=.42){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:0x394b56,roughness:.82}));m.position.set(x,bottom+h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
+ overhead(-14,2,6,1.8,1.28);overhead(-14,-3,6,1.8,1.18);overhead(-14,-8,6,1.8,1.34);
+ // Gap-jump route: raised pads are spaced so a committed jump can cross each gap.
+ box(15,4,5,5,1.05,0x667985,'GAP PAD');box(15,-3.4,5,5,1.05,0x667985,'GAP PAD');box(15,-10.8,5,5,1.05,0x667985,'GAP PAD');
  // side structures for depth cues
  box(-19,-18,9,12,4.5,0x5d6467); box(20,-38,11,16,6,0x596168); box(-21,-58,10,14,5.2,0x626a6c);
  const runner=new THREE.Group();scene.add(runner);
@@ -120,7 +125,7 @@ const botFront=new THREE.Mesh(new THREE.BoxGeometry(.20,.28,.035),new THREE.Mesh
 botFront.position.set(0,1.20,.37);bot.add(botFront);
 bot.position.set(0,0,17);
 const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,actionCooldown:0,slideTimer:0,parkourTimer:0,headStart:5,headStartDone:false};
- const state={vel:new THREE.Vector3(),yVel:0,onGround:true,stamina:150,sprint:false,slide:false,parkourBoost:0,parkourTimer:0,facing:Math.PI,joyX:0,joyY:0,support:null,autoSprint:false,lastSprintTap:0};
+ const state={vel:new THREE.Vector3(),yVel:0,onGround:true,stamina:150,sprint:false,slide:false,parkourBoost:0,parkourTimer:0,facing:Math.PI,joyX:0,joyY:0,support:null,autoSprint:false,lastSprintTap:0,crouch:false,slideTimer:0};
  const keys={}; let last=performance.now();
 let game={started:false,totalRounds:1,round:1,time:45,between:false,paused:false,offlineBot:true};
 let cameraHeading=Math.PI,movementHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
@@ -209,6 +214,9 @@ function surfaceAt(x,z,currentY,descending){
 }
 function blocked(nx,nz){
   const radius=.30, feet=runner.position.y;
+  // Overhead gates only block an upright runner; crouching/sliding passes underneath.
+  if(!state.crouch&&!state.slide){for(const g of [{x:-14,z:2,w:6,d:1.8},{x:-14,z:-3,w:6,d:1.8},{x:-14,z:-8,w:6,d:1.8}]){if(nx>g.x-g.w/2-radius&&nx<g.x+g.w/2+radius&&nz>g.z-g.d/2-radius&&nz<g.z+g.d/2+radius)return true;}}
+
   for(const o of obstacles){
     if(!insideXZ(o,nx,nz,radius))continue;
     // If our feet are already at/above the top, this is a walkable top surface, not a wall.
@@ -238,7 +246,10 @@ sprintBtn.addEventListener('pointerdown',e=>{
 });
 const sprintRelease=()=>{state.sprint=false;sprintBtn.classList.remove('active')};
 sprintBtn.addEventListener('pointerup',sprintRelease);sprintBtn.addEventListener('pointercancel',sprintRelease);
-hold('slide','slide');document.getElementById('jump').addEventListener('pointerdown',jump);document.getElementById('parkour').addEventListener('pointerdown',parkour);
+const slideBtn=document.getElementById('slide');
+slideBtn.addEventListener('pointerdown',e=>{state.crouch=true;state.slide=true;state.slideTimer=(state.sprint||state.autoSprint)?0.78:0;slideBtn.classList.add('active');slideBtn.setPointerCapture(e.pointerId)});
+const slideUp=()=>{state.crouch=false;if(state.slideTimer<=0)state.slide=false;slideBtn.classList.remove('active')};slideBtn.addEventListener('pointerup',slideUp);slideBtn.addEventListener('pointercancel',slideUp);
+document.getElementById('jump').addEventListener('pointerdown',jump);document.getElementById('parkour').addEventListener('pointerdown',parkour);
  function botInside(o,x,z,pad=0){return x>o.x-o.w/2-pad&&x<o.x+o.w/2+pad&&z>o.z-o.d/2-pad&&z<o.z+o.d/2+pad}
  function botFrontObstacle(range=1.25){
    const f=new THREE.Vector3(Math.sin(botState.facing),0,Math.cos(botState.facing));
@@ -347,7 +358,8 @@ canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercan
      return;
    }
    let ix=state.joyX+(keys.d?1:0)-(keys.a?1:0), iz=state.joyY+(keys.s?1:0)-(keys.w?1:0);if(!game.started||game.between||game.paused){ix=0;iz=0;}let mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;mag=1}
-   const wantsSprint=(state.sprint||state.autoSprint||keys.shift)&&mag>.12&&state.stamina>0;let speed=wantsSprint?7.4:5.25;if(state.slide&&mag>.15&&state.stamina>1){speed=8.0;state.stamina=Math.max(0,state.stamina-9*dt)}
+   if(state.slideTimer>0){state.slideTimer=Math.max(0,state.slideTimer-dt);state.slide=true}else if(!state.crouch)state.slide=false;
+   const wantsSprint=(state.sprint||state.autoSprint||keys.shift)&&mag>.12&&state.stamina>0&&!state.crouch;let speed=wantsSprint?7.4:(state.crouch?3.25:5.25);if(state.slide&&mag>.15&&state.stamina>1){speed=state.slideTimer>0?8.15:3.25;state.stamina=Math.max(0,state.stamina-7*dt)}
    if(wantsSprint){state.stamina=Math.max(0,state.stamina-12*dt)}else if(!state.slide){state.stamina=Math.min(150,state.stamina+14*dt)}
    // Direct screen-relative joystick movement.
    // The stick position is the travel direction: up/left/right/down map directly to the screen.
@@ -430,7 +442,7 @@ canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercan
      }
    }
    // simple run motion
-   const moving=mag>.12;const phase=now*.012*(wantsSprint?1.4:1);legL.rotation.x=moving?Math.sin(phase)*.55:0;legR.rotation.x=moving?-Math.sin(phase)*.55:0;torso.rotation.z=state.slide?.18:0;runner.scale.y=state.slide?.72:1;
+   const moving=mag>.12;const phase=now*.012*(wantsSprint?1.4:1);legL.rotation.x=moving?Math.sin(phase)*.55:0;legR.rotation.x=moving?-Math.sin(phase)*.55:0;torso.rotation.z=state.slide?.34:0;runner.scale.y=(state.crouch||state.slide)?.62:1;
    updateBot(dt,now);
    // Free-look camera: right-thumb camera movement does not directly steer the runner.
    // After release, it recenters slowly so the player has time to inspect their surroundings.
