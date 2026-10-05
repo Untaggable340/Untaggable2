@@ -119,12 +119,15 @@ try{
  const earGeo=new THREE.SphereGeometry(.045,10,8),earL=new THREE.Mesh(earGeo,skin),earR=earL.clone();earL.scale.x=.55;earR.scale.x=.55;earL.position.set(-.276,1.99,0);earR.position.set(.276,1.99,0);runner.add(earL,earR);
  const pelvis=new THREE.Mesh(new THREE.BoxGeometry(.55,.24,.34),pants);pelvis.position.y=.82;runner.add(pelvis);
  const belt=new THREE.Mesh(new THREE.BoxGeometry(.57,.075,.355),new THREE.MeshStandardMaterial({color:0x171b20,roughness:.9}));belt.position.y=.91;runner.add(belt);belt.userData.skinRole='pants';
+ const beltBuckle=new THREE.Mesh(new THREE.BoxGeometry(.095,.07,.035),new THREE.MeshStandardMaterial({color:0x6f7478,metalness:.35,roughness:.55}));beltBuckle.position.set(0,.91,.195);runner.add(beltBuckle);
+ const seamMat=new THREE.MeshStandardMaterial({color:0x171b20,roughness:.95}),shirtSeamL=new THREE.Mesh(new THREE.BoxGeometry(.018,.48,.018),seamMat),shirtSeamR=shirtSeamL.clone();shirtSeamL.position.set(-.31,1.26,.29);shirtSeamR.position.set(.31,1.26,.29);runner.add(shirtSeamL,shirtSeamR);
  const shoulders=new THREE.Group();shoulders.position.y=1.48;runner.add(shoulders);
  const armGeo=new THREE.CapsuleGeometry(.125,.50,8,14),armL=new THREE.Mesh(armGeo,skin),armR=armL.clone();armL.position.set(-.43,1.27,0);armR.position.set(.43,1.27,0);armL.rotation.z=-.08;armR.rotation.z=.08;shoulders.add(armL,armR);armL.position.set(-.43,-.21,0);armR.position.set(.43,-.21,0);
  const handGeo=new THREE.SphereGeometry(.115,12,9),handL=new THREE.Mesh(handGeo,skin),handR=handL.clone();handL.position.set(-.46,.91,0);handR.position.set(.46,.91,0);armL.add(handL);armR.add(handR);handL.position.set(0,-.36,0);handR.position.set(0,-.36,0);
  const shirtHem=new THREE.Mesh(new THREE.CylinderGeometry(.31,.29,.10,18),shirt);shirtHem.scale.z=.78;shirtHem.position.y=.94;runner.add(shirtHem);shirtHem.userData.skinRole='shirt';
  const collar=new THREE.Mesh(new THREE.TorusGeometry(.125,.025,6,18),new THREE.MeshStandardMaterial({color:0x18232b,roughness:.8}));collar.rotation.x=Math.PI/2;collar.position.set(0,1.70,.01);runner.add(collar);collar.userData.skinRole='shirt';
  const frontPatch=new THREE.Mesh(new THREE.BoxGeometry(.20,.27,.035),new THREE.MeshStandardMaterial({color:0xd8e2e8,roughness:.7}));frontPatch.position.set(0,0,.49);torso.add(frontPatch);
+ const chestMark=new THREE.Mesh(new THREE.BoxGeometry(.12,.045,.018),new THREE.MeshStandardMaterial({color:0x20262b,roughness:.75}));chestMark.position.set(0,.10,.515);torso.add(chestMark);
  const backPatch=new THREE.Mesh(new THREE.BoxGeometry(.25,.29,.035),new THREE.MeshStandardMaterial({color:0x17202a,roughness:.75}));backPatch.position.set(0,0,-.49);torso.add(backPatch);
  const legL=new THREE.Mesh(new THREE.CapsuleGeometry(.16,.58,8,14),pants),legR=legL.clone();legL.position.set(-.17,.49,0);legR.position.set(.17,.49,0);runner.add(legL,legR);
 const shirtSleeveGeo=new THREE.CylinderGeometry(.145,.135,.20,14),shirtSleeveL=new THREE.Mesh(shirtSleeveGeo,shirt),shirtSleeveR=shirtSleeveL.clone();
