@@ -1,0 +1,1 @@
+import{mkdir,copyFile,cp,rm}from'node:fs/promises';await rm('www',{recursive:true,force:true});await mkdir('www/src',{recursive:true});for(const f of['index.html','styles.css'])await copyFile(f,'www/'+f);await cp('src','www/src',{recursive:true});console.log('Prepared bundled offline web assets in www/');
