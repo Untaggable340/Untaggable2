@@ -112,8 +112,8 @@ try{
  const shoulders=new THREE.Group();shoulders.position.y=1.48;runner.add(shoulders);
  const armGeo=new THREE.CapsuleGeometry(.115,.48,6,10),armL=new THREE.Mesh(armGeo,skin),armR=armL.clone();armL.position.set(-.43,1.27,0);armR.position.set(.43,1.27,0);armL.rotation.z=-.08;armR.rotation.z=.08;shoulders.add(armL,armR);armL.position.set(-.43,-.21,0);armR.position.set(.43,-.21,0);
  const handGeo=new THREE.SphereGeometry(.115,12,9),handL=new THREE.Mesh(handGeo,skin),handR=handL.clone();handL.position.set(-.46,.91,0);handR.position.set(.46,.91,0);armL.add(handL);armR.add(handR);handL.position.set(0,-.36,0);handR.position.set(0,-.36,0);
- const frontPatch=new THREE.Mesh(new THREE.BoxGeometry(.20,.27,.035),new THREE.MeshStandardMaterial({color:0xd8e2e8,roughness:.7}));frontPatch.position.set(0,1.26,.35);runner.add(frontPatch);
- const backPatch=new THREE.Mesh(new THREE.BoxGeometry(.25,.29,.035),new THREE.MeshStandardMaterial({color:0x17202a,roughness:.75}));backPatch.position.set(0,1.26,-.35);runner.add(backPatch);
+ const frontPatch=new THREE.Mesh(new THREE.BoxGeometry(.20,.27,.035),new THREE.MeshStandardMaterial({color:0xd8e2e8,roughness:.7}));frontPatch.position.set(0,0,.49);torso.add(frontPatch);
+ const backPatch=new THREE.Mesh(new THREE.BoxGeometry(.25,.29,.035),new THREE.MeshStandardMaterial({color:0x17202a,roughness:.75}));backPatch.position.set(0,0,-.49);torso.add(backPatch);
  const legL=new THREE.Mesh(new THREE.CapsuleGeometry(.145,.56,6,10),pants),legR=legL.clone();legL.position.set(-.17,.49,0);legR.position.set(.17,.49,0);runner.add(legL,legR);
  const shoeGeo=new THREE.BoxGeometry(.25,.17,.42),shoeL=new THREE.Mesh(shoeGeo,shoeMat),shoeR=shoeL.clone();legL.add(shoeL);legR.add(shoeR);shoeL.position.set(0,-.40,.07);shoeR.position.set(0,-.40,.07);
  [neck,head,armL,armR,handL,handR].forEach(m=>m.userData.skinRole='skin');[torso,chest,waist].forEach(m=>m.userData.skinRole='shirt');[pelvis,legL,legR].forEach(m=>m.userData.skinRole='pants');[hair,hairBack,hairSideL,hairSideR].forEach(m=>m.userData.skinRole='hair');[shoeL,shoeR].forEach(m=>m.userData.skinRole='shoe');
@@ -141,7 +141,7 @@ let game={started:false,totalRounds:1,round:1,time:60,between:false,paused:false
 let cameraHeading=Math.PI,movementHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
 function resetRound(){
  Object.keys(keys).forEach(k=>keys[k]=false);
- runner.position.set(0,0,10);state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.sprint=false;state.autoSprint=false;state.joyX=0;state.joyY=0;sprintBtn?.classList.remove('auto','active');knob&&(knob.style.transform='');
+ runner.position.set(0,0,10);runner.rotation.y=state.facing;torso.rotation.set(0,0,0);legL.rotation.x=0;legR.rotation.x=0;armL.rotation.x=0;armR.rotation.x=0;runner.scale.y=characterLooks[selectedCharacter].scale[1];state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.sprint=false;state.autoSprint=false;state.joyX=0;state.joyY=0;sprintBtn?.classList.remove('auto','active');knob&&(knob.style.transform='');
  bot.position.set(0,0,17);chooseBotCharacter();botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;botState.actionCooldown=0;botState.slideTimer=0;botState.parkourTimer=0;if(botLegL)botLegL.rotation.x=0;if(botLegR)botLegR.rotation.x=0;if(botArmL)botArmL.rotation.x=0;if(botArmR)botArmR.rotation.x=0;if(botTorso)botTorso.rotation.x=0;
  botState.headStart=5;botState.headStartDone=false;game.time=60;game.between=false;cameraHeading=state.facing;movementHeading=state.facing;cameraPitch=.05;
 }
