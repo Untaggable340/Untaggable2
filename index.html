@@ -175,7 +175,7 @@ function setPaused(v){
 pauseBtn.addEventListener('click',()=>setPaused(true));
 document.getElementById('resumeGame').addEventListener('click',()=>setPaused(false));
 document.getElementById('restartGame').addEventListener('click',()=>{
- game.paused=false;pauseMenu.style.display='none';game.round=1;resetRound();
+ game.paused=false;game.between=false;pauseMenu.style.display='none';game.round=1;resetRound();
 });
 document.getElementById('mainMenuBtn').addEventListener('click',()=>{
  game.paused=false;game.started=false;game.between=false;state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.crouch=false;state.slide=false;sprintBtn?.classList.remove('auto','active');pauseMenu.style.display='none';pauseBtn.style.display='none';
@@ -187,8 +187,9 @@ document.getElementById('startGame').addEventListener('click',()=>{
 });
 
  const toastEl=document.getElementById('toast');function toast(t){toastEl.textContent=t;toastEl.style.opacity=1;clearTimeout(toastEl._t);toastEl._t=setTimeout(()=>toastEl.style.opacity=0,650)}
- function jump(){if(state.onGround&&state.stamina>=5){state.yVel=6.7;state.onGround=false;state.support=null;state.stamina-=5;toast('JUMP')}}
+ function jump(){if(!game.started||game.paused||game.between)return;if(state.onGround&&state.stamina>=5){state.yVel=6.7;state.onGround=false;state.support=null;state.stamina-=5;toast('JUMP')}}
  function parkour(){
+  if(!game.started||game.paused||game.between)return;
   if(state.stamina<8)return;
   const hit=frontObstacle(1.45);
   const sprinting=state.autoSprint||state.sprint||keys.shift;
@@ -239,7 +240,7 @@ function blocked(nx,nz){
   }
   return false;
 }
- addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space')jump();if(e.key.toLowerCase()==='e')parkour()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+ addEventListener('keydown',e=>{if(!game.started||game.paused||game.between)return;keys[e.key.toLowerCase()]=true;if(e.code==='Space')jump();if(e.key.toLowerCase()==='e')parkour()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
  const joy=document.getElementById('joy'),knob=document.getElementById('knob');let jid=null;function joySet(e){const r=joy.getBoundingClientRect();let x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2,m=Math.hypot(x,y),lim=43;if(m>lim){x*=lim/m;y*=lim/m}let nx=x/lim,ny=y/lim;const dead=.025,raw=Math.hypot(nx,ny);if(raw<dead){nx=0;ny=0}else{const scaled=Math.pow((raw-dead)/(1-dead),.82),s=scaled/raw;nx*=s;ny*=s}state.joyX=nx;state.joyY=ny;knob.style.transform=`translate(${x}px,${y}px)`}joy.addEventListener('pointerdown',e=>{jid=e.pointerId;joy.setPointerCapture(jid);joySet(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===jid)joySet(e)});function jend(e){if(e.pointerId===jid){jid=null;state.joyX=state.joyY=0;knob.style.transform=''}}joy.addEventListener('pointerup',jend);joy.addEventListener('pointercancel',jend);
  function hold(id,key){const el=document.getElementById(id);el.addEventListener('pointerdown',e=>{state[key]=true;el.classList.add('active');el.setPointerCapture(e.pointerId)});const up=()=>{state[key]=false;el.classList.remove('active')};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)}
 const sprintBtn=document.getElementById('sprint');
@@ -348,7 +349,8 @@ document.getElementById('jump').addEventListener('pointerdown',jump);document.ge
    if(botTorso)botTorso.rotation.x=moving?(wantsSprint?.11:.045):0;
 
    // A simple tag event for this prototype; reset the bot behind you so testing can continue.
-   if(dist<.78&&Math.abs(bot.position.y-runner.position.y)<1.25){
+   const tagDist=Math.hypot(runner.position.x-bot.position.x,runner.position.z-bot.position.z);
+   if(tagDist<.78&&Math.abs(bot.position.y-runner.position.y)<1.25){
      finishRound('TAGGED!');
    }
  }
