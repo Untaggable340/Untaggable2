@@ -320,7 +320,7 @@ function surfaceAt(x,z,currentY,descending){
 function blocked(nx,nz){
   const radius=.30, feet=runner.position.y;
   // Overhead gates only block an upright runner; crouching/sliding passes underneath.
-  if(!state.crouch&&!state.slide){for(const g of overheads){if(nx>g.x-g.w/2-radius&&nx<g.x+g.w/2+radius&&nz>g.z-g.d/2-radius&&nz<g.z+g.d/2+radius)return true;}}
+  if(!state.crouch&&!state.slide){for(const g of overheads){const gateTop=g.bottom+g.h;if(feet<gateTop-.05&&nx>g.x-g.w/2-radius&&nx<g.x+g.w/2+radius&&nz>g.z-g.d/2-radius&&nz<g.z+g.d/2+radius)return true;}}
 
   for(const o of obstacles){
     if(!insideXZ(o,nx,nz,radius))continue;
