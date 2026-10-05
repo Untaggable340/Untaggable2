@@ -62,10 +62,22 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0d1117;col
  <div id="buttons"><div class="action" id="sprint"><span class="icon">»</span><span class="word">SPRINT</span></div><div class="action" id="parkour"><span class="icon">↗</span><span class="word">PARKOUR</span></div><div class="action" id="slide"><span class="icon">▱</span><span class="word">SLIDE</span></div><div class="action" id="jump"><span class="icon">↥</span><span class="word">JUMP</span></div></div>
 </div>
 <div id="rotate"><div><span>📱</span>TURN YOUR PHONE SIDEWAYS<br><small>Untaggable 3D is designed for landscape play.</small></div></div>
+<script>
+window.__untaggableBooted=false;
+window.__untaggableBootStage='page';
+(function(){
+  const fail=function(message){
+    const l=document.getElementById('loading'),x=document.getElementById('error');
+    if(l)l.style.display='none';
+    if(x){x.textContent='STARTUP ERROR ['+(window.__untaggableBootStage||'unknown')+']: '+message;x.style.display='flex';}
+  };
+  window.addEventListener('error',e=>fail(e.message||'JavaScript error'));
+  window.addEventListener('unhandledrejection',e=>{const r=e.reason;fail(r&&r.message?r.message:String(r||'Unhandled promise rejection'));});
+  setTimeout(()=>{if(!window.__untaggableBooted)fail('initialization timed out');},15000);
+})();
+</script>
 <script type="module">
-(async()=>{
-try{
- const THREE=await import("./vendor/three.module.min.js");
+(async()=>{\ntry{\n window.__untaggableBootStage="three-import";\n const THREE=await import("./vendor/three.module.min.js");\n window.__untaggableBootStage="renderer";
  const canvas=document.getElementById('game'),stamEl=document.getElementById('stam');
  const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  const MAX_RENDER_W=1920,MAX_RENDER_H=1080;
@@ -712,7 +724,7 @@ canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercan
    const target=runner.position.clone().add(back);camera.position.lerp(target,1-Math.pow(.001,dt));
    const look=runner.position.clone().add(new THREE.Vector3(0,1.15+cameraPitch,0)).add(new THREE.Vector3(Math.sin(cameraViewAngle),0,Math.cos(cameraViewAngle)).multiplyScalar(2.2));camera.lookAt(look);
    stamEl.style.width=(state.stamina/150*100)+'%';renderer.render(scene,camera)
- }requestAnimationFrame(loop);document.getElementById('loading').style.display='none';
+ }requestAnimationFrame(loop);window.__untaggableBootStage='ready';window.__untaggableBooted=true;document.getElementById('loading').style.display='none';
 }catch(err){console.error(err);const loading=document.getElementById('loading'),error=document.getElementById('error');loading.style.display='none';error.textContent='STARTUP ERROR: '+(err&&err.message?err.message:String(err));error.style.display='flex'}
 })();
 </script>
