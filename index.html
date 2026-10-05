@@ -293,7 +293,7 @@ document.getElementById('startGame').addEventListener('click',()=>{
  function jump(){if(!game.started||game.paused||game.between)return;if(state.onGround){const full=state.stamina>=5;const sprinting=(state.sprint||state.autoSprint||keys.shift)&&!state.crouch;state.yVel=full?6.7:5.75;state.onGround=false;state.support=null;if(full)state.stamina=Math.max(0,state.stamina-5);if(sprinting){state.parkourBoost=full?7.65:6.10;state.parkourTimer=Math.max(state.parkourTimer,.24);}toast(full?'JUMP':'EXHAUSTED JUMP')}}
  function parkour(){
   if(!game.started||game.paused||game.between)return;
-  if(state.stamina<8)return;
+  if(state.stamina<7)return;
   const hit=frontObstacle(1.45);
   const sprinting=state.autoSprint||state.sprint||keys.shift;
   // Airborne Jump + Parkour is the dedicated climb chain.
@@ -301,7 +301,7 @@ document.getElementById('startGame').addEventListener('click',()=>{
     if(!hit){toast('NO LEDGE');return;}
     const riseNeeded=hit.h-runner.position.y;
     if(riseNeeded>3.35){toast('TOO HIGH');return;}
-    state.stamina-=10;
+    state.stamina=Math.max(0,state.stamina-10);
     // Stronger upward pull than ordinary vault/mantle so climb-only routes are reachable.
     state.yVel=Math.max(state.yVel,7.25);
     state.parkourBoost=sprinting?8.2:6.4;
@@ -314,9 +314,9 @@ document.getElementById('startGame').addEventListener('click',()=>{
   const h=hit.h;
   if(hit.climbOnly){toast('JUMP + PARKOUR TO CLIMB');return;}
   state.support=null;state.onGround=false;
-  if(h<=1.0){state.yVel=4.7;state.parkourBoost=sprinting?8.7:6.2;state.parkourTimer=.34;state.stamina-=7;toast('VAULT');}
-  else if(h<=1.65){state.yVel=6.0;state.parkourBoost=sprinting?8.0:5.5;state.parkourTimer=.44;state.stamina-=9;toast('MANTLE');}
-  else if(h<=2.35){state.yVel=6.4;state.parkourBoost=sprinting?7.2:4.8;state.parkourTimer=.50;state.stamina-=11;toast('CLIMB');}
+  if(h<=1.0){state.yVel=4.7;state.parkourBoost=sprinting?8.7:6.2;state.parkourTimer=.34;state.stamina=Math.max(0,state.stamina-7);toast('VAULT');}
+  else if(h<=1.65){state.yVel=6.0;state.parkourBoost=sprinting?8.0:5.5;state.parkourTimer=.44;state.stamina=Math.max(0,state.stamina-9);toast('MANTLE');}
+  else if(h<=2.35){state.yVel=6.4;state.parkourBoost=sprinting?7.2:4.8;state.parkourTimer=.50;state.stamina=Math.max(0,state.stamina-11);toast('CLIMB');}
   else {state.onGround=true;toast('TOO HIGH — JUMP + PARKOUR');}
  }
  function frontObstacle(range){const f=new THREE.Vector3(Math.sin(state.facing),0,Math.cos(state.facing));let best=null,bd=999;for(const o of obstacles){const dx=Math.max(Math.abs(runner.position.x-o.x)-o.w/2,0),dz=Math.max(Math.abs(runner.position.z-o.z)-o.d/2,0);const d=Math.hypot(dx,dz);const to=new THREE.Vector3(o.x-runner.position.x,0,o.z-runner.position.z);if(to.lengthSq()>.001)to.normalize();if(d<range&&f.dot(to)>.35&&d<bd){best=o;bd=d}}return best}
