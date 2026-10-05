@@ -231,7 +231,7 @@ const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,act
  const keys={}; let last=performance.now();
 let game={started:false,totalRounds:1,round:1,time:60,between:false,paused:false,offlineBot:true};let roundTransitionTimer=null;
 let cameraHeading=Math.PI,movementHeading=Math.PI,cameraPitch=.05,lookPointer=null,lookLastX=0,lookLastY=0;
-function resetRound(){
+function resetRound(){if(roundTransitionTimer!==null){clearTimeout(roundTransitionTimer);roundTransitionTimer=null;}
  Object.keys(keys).forEach(k=>keys[k]=false);
  runner.position.set(0,0,10);state.facing=Math.PI;runner.rotation.y=state.facing;torso.rotation.set(0,0,0);legL.rotation.x=0;legR.rotation.x=0;armL.rotation.x=0;armR.rotation.x=0;runner.scale.y=characterLooks[selectedCharacter].scale[1];state.yVel=0;state.onGround=true;state.support=null;state.stamina=150;state.crouch=false;state.slide=false;state.slideTimer=0;state.parkourTimer=0;state.parkourBoost=0;state.sprint=false;state.autoSprint=false;state.lastSprintTap=0;state.joyX=0;state.joyY=0;sprintBtn?.classList.remove('auto','active');knob&&(knob.style.transform='');
  bot.position.set(0,0,17);botState.facing=Math.PI;bot.rotation.y=botState.facing;chooseBotCharacter();botState.yVel=0;botState.onGround=true;botState.support=null;botState.stamina=150;botState.actionCooldown=0;botState.slideTimer=0;botState.parkourTimer=0;if(botLegL)botLegL.rotation.x=0;if(botLegR)botLegR.rotation.x=0;if(botArmL)botArmL.rotation.x=0;if(botArmR)botArmR.rotation.x=0;if(botTorso)botTorso.rotation.x=0;
