@@ -83,10 +83,10 @@ try{
 // Arena visual pass: pale concrete parkour bowl inspired by the supplied reference, while keeping gameplay collision routes intact.
 const concreteMat=new THREE.MeshStandardMaterial({color:0xb9b8b1,roughness:.96,metalness:0});
 const concreteDark=new THREE.MeshStandardMaterial({color:0x777873,roughness:.98,metalness:0});
-function concreteBlock(x,z,w,d,h,y=0){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),concreteMat);m.position.set(x,y+h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
+function concreteBlock(x,z,w,d,h,y=0,solid=false){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),concreteMat);m.position.set(x,y+h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);if(solid&&y===0)obstacles.push({mesh:m,x,z,w,d,h,label:'ARENA',climbOnly:false});return m}
 function concreteRamp(x,z,w,d,h,ry=0){const g=new THREE.BoxGeometry(w,.32,d),m=new THREE.Mesh(g,concreteMat);m.position.set(x,h*.48,z);m.rotation.set(-Math.atan2(h,d),ry,0);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
 // Raised central sparring/parkour dais with stepped edges.
-concreteBlock(0,18,14,11,.32);concreteBlock(0,18,11.8,8.8,.64);concreteBlock(0,18,9.5,6.6,.96);
+concreteBlock(0,18,14,11,.32,0,true);concreteBlock(0,18,11.8,8.8,.64);concreteBlock(0,18,9.5,6.6,.96);
 // Architectural perimeter masses and recessed dark openings create the enclosed arena silhouette.
 concreteBlock(-32,24,7,24,5.4);concreteBlock(32,24,7,24,5.4);
 concreteBlock(-28,-6,9,15,4.4);concreteBlock(28,-6,9,15,4.4);
@@ -155,7 +155,7 @@ concreteBlock(-35,56,10,3,2.8);concreteBlock(35,56,10,3,2.8);
 detailSlab(-18,56.2,18,2,.26,capMat,3.05);detailSlab(18,56.2,18,2,.26,capMat,3.05);
 // Small staggered blocks provide emergency jukes near the central dais.
 concreteBlock(-7,13,2.2,2.2,.62);concreteBlock(7,13,2.2,2.2,.62);
-concreteBlock(-10,20,2.4,2.4,.88);concreteBlock(10,20,2.4,2.4,.88);
+concreteBlock(-10,20,2.4,2.4,.88,0,true);concreteBlock(10,20,2.4,2.4,.88,0,true);
 // Mobile performance pass: merge static visual detail intent through conservative shadow settings.
 const arenaStaticMeshes=[];
 scene.traverse(o=>{if(o.isMesh){if(o.geometry&&o.geometry.type==='BoxGeometry'&&o.position.y>3.2){o.castShadow=false}if(o.material===wearMat||o.material===edgeMat||o.material===capMat){o.castShadow=false}arenaStaticMeshes.push(o)}});
