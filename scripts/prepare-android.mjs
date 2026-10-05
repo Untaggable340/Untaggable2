@@ -16,17 +16,8 @@ let html=await readFile('www/index.html','utf8');
 const dynamicImport='const THREE=await import("./vendor/three.module.min.js");';
 if(!html.includes(dynamicImport))throw new Error('Expected Three.js dynamic import was not found');
 
-const watchdog=`<script>
-window.__untaggableBooted=false;
-window.addEventListener('error',function(e){var l=document.getElementById('loading'),x=document.getElementById('error');if(l)l.style.display='none';if(x){x.textContent='STARTUP ERROR: '+(e.message||'Unknown JavaScript error');x.style.display='flex';}});
-window.addEventListener('unhandledrejection',function(e){var l=document.getElementById('loading'),x=document.getElementById('error');if(l)l.style.display='none';if(x){var r=e.reason;x.textContent='STARTUP ERROR: '+(r&&r.message?r.message:String(r||'Unhandled promise rejection'));x.style.display='flex';}});
-setTimeout(function(){if(!window.__untaggableBooted){var l=document.getElementById('loading'),x=document.getElementById('error');if(l)l.style.display='none';if(x){x.textContent='STARTUP ERROR: initialization timed out';x.style.display='flex';}}},12000);
-</script>`;
-html=html.replace('<script type="module">',watchdog+'\n<script type="module">');
-
-const bootMarker="}requestAnimationFrame(loop);document.getElementById('loading').style.display='none';";
-if(!html.includes(bootMarker))throw new Error('Game boot completion marker was not found');
-html=html.replace(bootMarker,"}requestAnimationFrame(loop);window.__untaggableBooted=true;document.getElementById('loading').style.display='none';");
+if(!html.includes('window.__untaggableBooted=false'))throw new Error('Web startup watchdog is missing');
+if(!html.includes('window.__untaggableBooted=true'))throw new Error('Web boot completion marker is missing');
 
 const moduleStart='<script type="module">';
 const moduleStartAt=html.indexOf(moduleStart);
