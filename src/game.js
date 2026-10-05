@@ -36,7 +36,8 @@ function polygon(points,color){x.fillStyle=color;x.beginPath();x.moveTo(...point
 function box3d(b){let[a,z,w,d]=b,h=1.7,tl=proj(a-w/2,z-d/2,h),tr=proj(a+w/2,z-d/2,h),br=proj(a+w/2,z+d/2,h),bl=proj(a-w/2,z+d/2,h),fl=proj(a-w/2,z+d/2,0),fr=proj(a+w/2,z+d/2,0),rr=proj(a+w/2,z-d/2,0);polygon([bl,br,fr,fl],'#8b9087');polygon([tr,br,fr,rr],'#777d75');polygon([tl,tr,br,bl],'#b9bdb3');x.strokeStyle='#52585055';x.beginPath();x.moveTo(...tl);x.lineTo(...tr);x.lineTo(...br);x.lineTo(...bl);x.closePath();x.stroke()}
 function person(a,color,label,isPlayer=false){
   let y=a.y||0,feet=proj(a.x,a.z,y),knee=proj(a.x,a.z,y+.42),hip=proj(a.x,a.z,y+.78),waist=proj(a.x,a.z,y+.94),chest=proj(a.x,a.z,y+1.28),shoulder=proj(a.x,a.z,y+1.38),neck=proj(a.x,a.z,y+1.48),head=proj(a.x,a.z,y+1.68),sc=Math.max(9,Math.min(W,H)/32);
-  const skin=isPlayer?'#9b694d':'#a87556',shirt=isPlayer?(P.infected?'#8d332d':'#1c3b52'):color,pants=isPlayer?'#202a31':'#252a2f',shoe='#11161a';
+  const looks={Finn:{skin:'#d1a07f',hair:'#5b3927',shirt:'#1c3b52',pants:'#202a31'},Gwen:{skin:'#70472f',hair:'#181414',shirt:'#65436f',pants:'#25232b'},Trinity:{skin:'#d8aa8d',hair:'#8b623f',shirt:'#7b4f59',pants:'#29272b'},Owen:{skin:'#5b3828',hair:'#171313',shirt:'#31533f',pants:'#202a25'}},look=looks[character]||looks.Finn;
+  const skin=isPlayer?look.skin:'#a87556',shirt=isPlayer?(P.infected?'#8d332d':look.shirt):color,pants=isPlayer?look.pants:'#252a2f',shoe='#11161a',hair=isPlayer?look.hair:'#17191b';
   x.fillStyle='#0003';x.beginPath();x.ellipse(feet[0],feet[1]+3,sc*.72,sc*.22,0,0,7);x.fill();
   // Solid athletic legs instead of stick lines.
   x.strokeStyle=pants;x.lineWidth=sc*.42;x.lineCap='round';x.beginPath();x.moveTo(hip[0]-sc*.16,hip[1]);x.lineTo(knee[0]-sc*.24,knee[1]);x.lineTo(feet[0]-sc*.28,feet[1]);x.moveTo(hip[0]+sc*.16,hip[1]);x.lineTo(knee[0]+sc*.24,knee[1]);x.lineTo(feet[0]+sc*.28,feet[1]);x.stroke();
@@ -48,7 +49,7 @@ function person(a,color,label,isPlayer=false){
   x.strokeStyle=skin;x.lineWidth=sc*.25;x.beginPath();x.moveTo(chest[0]-sc*.68,chest[1]+sc*.34);x.lineTo(waist[0]-sc*.58,waist[1]+sc*.22);x.moveTo(chest[0]+sc*.68,chest[1]+sc*.34);x.lineTo(waist[0]+sc*.58,waist[1]+sc*.22);x.stroke();
   x.fillStyle=skin;x.beginPath();x.arc(head[0],head[1],sc*.36,0,7);x.fill();
   // Hair cap and neck give the base model a readable human silhouette.
-  x.strokeStyle=skin;x.lineWidth=sc*.22;x.beginPath();x.moveTo(neck[0],neck[1]);x.lineTo(chest[0],chest[1]);x.stroke();x.fillStyle='#17191b';x.beginPath();x.arc(head[0],head[1]-sc*.10,sc*.36,Math.PI,Math.PI*2);x.fill();
+  x.strokeStyle=skin;x.lineWidth=sc*.22;x.beginPath();x.moveTo(neck[0],neck[1]);x.lineTo(chest[0],chest[1]);x.stroke();x.fillStyle=hair;x.beginPath();x.arc(head[0],head[1]-sc*.10,sc*.36,Math.PI,Math.PI*2);x.fill();
   if(isPlayer){
     let rel=Math.cos(facing-camYaw);
     if(rel>0){
