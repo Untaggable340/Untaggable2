@@ -257,14 +257,20 @@ function finishRound(reason){
 function applyCharacter(name){selectedCharacter=name;const l=characterLooks[name];skin.color.setHex(l.skin);shirt.color.setHex(l.shirt);pants.color.setHex(l.pants);hairMat.color.setHex(l.hair);shoeMat.color.setHex(l.shoe);runner.scale.set(...l.scale);torso.scale.set(1.08*l.build[0],l.build[1],.72*l.build[2]);chest.scale.set(1.08*l.build[0],.72*l.build[1],.68*l.build[2]);pelvis.scale.x=1.12*l.build[0];shoulders.scale.x=l.build[0];head.scale.set(baseHeadScale.x*l.head[0],baseHeadScale.y*l.head[1],baseHeadScale.z*l.head[2]);armL.scale.set(baseArmLScale.x*l.limb[0],baseArmLScale.y*l.limb[1],baseArmLScale.z*l.limb[0]);armR.scale.copy(armL.scale);legL.scale.set(baseLegLScale.x*l.limb[0],baseLegLScale.y*l.limb[1],baseLegLScale.z*l.limb[0]);legR.scale.copy(legL.scale);hairBack.visible=l.hairStyle==='long';hairBackL.visible=hairBackR.visible=l.hairStyle==='long';hairSideL.visible=hairSideR.visible=l.hairStyle==='sides'||l.hairStyle==='long';hairTop.visible=l.hairStyle!=='close';hairCrownL.visible=hairCrownR.visible=l.hairStyle==='short'||l.hairStyle==='sides';hairFringeL.visible=hairFringeR.visible=l.hairStyle!=='close';hair.scale.set(l.hairStyle==='close'?.90:.97,l.hairStyle==='close'?.36:.76,l.hairStyle==='close'?.92:.98);hairTop.scale.set(l.hairStyle==='long'?1.16:(l.hairStyle==='sides'?1.06:1.0),l.hairStyle==='long'?.72:.55,l.hairStyle==='long'?1.06:.95);hairFringeL.scale.y=hairFringeR.scale.y=l.hairStyle==='long'?1.35:1;
 // Per-character facial silhouette: subtle geometry differences keep the shared rig but stop faces reading as recolors.
 const faceProfiles={
- Finn:{jaw:[.98,1.02,1],cheek:[.98,1,1],brow:.08},
- Gwen:{jaw:[.92,1.06,.96],cheek:[1.04,1.03,.98],brow:.04},
- Trinity:{jaw:[.90,1.02,.94],cheek:[.98,.96,.96],brow:.02},
- Owen:{jaw:[1.08,1.04,1.02],cheek:[1.06,1.02,1],brow:.10}
+ Finn:{jaw:[.98,1.02,1],cheek:[.98,1,1],brow:.08,collar:[1,1],patch:[1,.96],back:[1,1]},
+ Gwen:{jaw:[.92,1.06,.96],cheek:[1.04,1.03,.98],brow:.04,collar:[.92,.88],patch:[.88,1.10],back:[.92,1.08]},
+ Trinity:{jaw:[.90,1.02,.94],cheek:[.98,.96,.96],brow:.02,collar:[.88,.82],patch:[1.08,.82],back:[1.06,.88]},
+ Owen:{jaw:[1.08,1.04,1.02],cheek:[1.06,1.02,1],brow:.10,collar:[1.10,1.06],patch:[1.12,1.08],back:[1.12,1.04]}
 },fp=faceProfiles[name];
 jaw.scale.set(.84*fp.jaw[0],.58*fp.jaw[1],.78*fp.jaw[2]);
 cheekL.scale.set(1*fp.cheek[0],.55*fp.cheek[1],.42*fp.cheek[2]);cheekR.scale.copy(cheekL.scale);
 browL.rotation.z=-fp.brow;browR.rotation.z=fp.brow;
+// Outfit silhouette varies per runner while retaining the shared parkour rig.
+collar.scale.set(fp.collar[0],fp.collar[0],fp.collar[1]);
+frontPatch.scale.set(fp.patch[0],fp.patch[1],1);backPatch.scale.set(fp.back[0],fp.back[1],1);
+backAccent.scale.x=fp.back[0];spinePanel.scale.y=fp.back[1];
+shirtSleeveL.scale.x=shirtSleeveR.scale.x=name==='Owen'?1.08:(name==='Trinity'?.92:1);
+shirtSleeveL.scale.y=shirtSleeveR.scale.y=name==='Gwen'?1.10:1;
 document.querySelectorAll('.characterChoice').forEach(b=>b.classList.toggle('selected',b.dataset.character===name));}
 let previewIndex=0;const charSelect=document.getElementById('characterSelect'),previewPerson=document.getElementById('previewPerson');
 function showPreview(){const name=charNames[previewIndex],l=characterLooks[name];document.getElementById('previewName').textContent=name.toUpperCase();document.getElementById('previewTag').textContent={Finn:'BALANCED PARKOUR RUNNER',Gwen:'QUICK • AGILE • FEARLESS',Trinity:'CONTROLLED • SHARP • FAST',Owen:'POWERFUL • ATHLETIC • STEADY'}[name];document.getElementById('confirmCharacter').textContent='SELECT '+name.toUpperCase();previewPerson.style.setProperty('--skin','#'+l.skin.toString(16).padStart(6,'0'));previewPerson.style.setProperty('--hair','#'+l.hair.toString(16).padStart(6,'0'));previewPerson.style.setProperty('--shirt','#'+l.shirt.toString(16).padStart(6,'0'));previewPerson.style.setProperty('--pants','#'+l.pants.toString(16).padStart(6,'0'));previewPerson.style.setProperty('--shoe','#'+l.shoe.toString(16).padStart(6,'0'));previewPerson.dataset.style=l.hairStyle;}
