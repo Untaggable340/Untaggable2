@@ -633,7 +633,7 @@ canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercan
        for(const o of obstacles){
          if(!insideXZ(o,runner.position.x,runner.position.z,.30)) continue;
          // Swept crossing test with extra tolerance for fast movement / mobile frame drops.
-         if(oldFeet>=o.h-.20 && newFeet<=o.h+.28 && o.h>bestTop){
+         if(oldFeet>=o.h-.20 && newFeet<=o.h+.28 && o.h<=oldFeet+.28 && o.h>bestTop){
            bestTop=o.h;bestObj=o;
          }
        }
