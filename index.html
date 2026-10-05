@@ -149,6 +149,13 @@ routeEdge(-13,2.77,42,10,.12);routeEdge(13,2.77,42,10,.12);
 routeEdge(0,4.0,45,12,.16);
 // Sparse wall panel seams add scale cues similar to poured/precast concrete construction.
 for(const x of [-38,-19,0,19,38]){const seam=new THREE.Mesh(new THREE.BoxGeometry(.055,3.0,.08),edgeMat);seam.position.set(x,1.5,58.62);scene.add(seam)}
+// Final architectural silhouette pass: broken-height parapets and corner masses frame the arena without closing sightlines.
+concreteBlock(-40,47,4,14,4.2);concreteBlock(40,47,4,14,4.2);
+concreteBlock(-35,56,10,3,2.8);concreteBlock(35,56,10,3,2.8);
+detailSlab(-18,56.2,18,2,.26,capMat,3.05);detailSlab(18,56.2,18,2,.26,capMat,3.05);
+// Small staggered blocks provide emergency jukes near the central dais.
+concreteBlock(-7,13,2.2,2.2,.62);concreteBlock(7,13,2.2,2.2,.62);
+concreteBlock(-10,20,2.4,2.4,.88);concreteBlock(10,20,2.4,2.4,.88);
 
 // Thin dark strips visually mark ledge lips so jumps remain readable on small mobile screens.
 for(const x of [-26,-20,-14,14,20,26]){const lip=new THREE.Mesh(new THREE.BoxGeometry(5.3,.045,.10),concreteDark);lip.position.set(x,x<0?(.02*x-.15):(.02*x-.43),-0.0);lip.visible=false;scene.add(lip)}
