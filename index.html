@@ -467,8 +467,10 @@ sprintBtn.addEventListener('pointerdown',e=>{
    state.sprint=true;state.lastSprintTap=now;sprintBtn.classList.add('active');
  }
 });
-const sprintRelease=()=>{state.sprint=false;sprintBtn.classList.remove('active')};
-sprintBtn.addEventListener('pointerup',sprintRelease);sprintBtn.addEventListener('pointercancel',sprintRelease);
+let sprintPointer=null;
+sprintBtn.addEventListener('pointerdown',e=>{if(state.sprint&&!state.autoSprint)sprintPointer=e.pointerId},{capture:true});
+const sprintRelease=e=>{if(sprintPointer!==null&&e.pointerId!==sprintPointer)return;sprintPointer=null;state.sprint=false;sprintBtn.classList.remove('active')};
+sprintBtn.addEventListener('pointerup',sprintRelease);sprintBtn.addEventListener('pointercancel',sprintRelease);sprintBtn.addEventListener('lostpointercapture',sprintRelease);
 const slideBtn=document.getElementById('slide');
 slideBtn.addEventListener('pointerdown',e=>{if(!game.started||game.paused||game.between)return;state.crouch=true;state.slide=true;state.slideTimer=(state.sprint||state.autoSprint||keys.shift)?0.78:0;slideBtn.classList.add('active');slideBtn.setPointerCapture(e.pointerId)});
 const slideUp=()=>{state.crouch=false;if(state.slideTimer<=0)state.slide=false;slideBtn.classList.remove('active')};slideBtn.addEventListener('pointerup',slideUp);slideBtn.addEventListener('pointercancel',slideUp);slideBtn.addEventListener('lostpointercapture',slideUp);
