@@ -670,8 +670,8 @@ canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercan
    armL.rotation.z=air?-.22:-.08;armR.rotation.z=air?.22:.08;
    let lean=moving?(wantsSprint?.13:.055):0;
    torso.rotation.x=lean;torso.rotation.z=0;pelvis.rotation.y=moving?step*.055:0;shoulders.rotation.y=moving?-step*.07:0;
-   torso.position.y=1.25+(moving&&!air?Math.abs(Math.sin(phase*2))*.025:0);
-   head.position.y=1.98+(moving&&!air?Math.abs(Math.sin(phase*2))*.018:0);
+   torso.position.y=1.31+(moving&&!air?Math.abs(Math.sin(phase*2))*.025:0);
+   head.position.y=2.06+(moving&&!air?Math.abs(Math.sin(phase*2))*.018:0);
    if(air){torso.rotation.x=state.yVel>0?-.10:.12;shoulders.rotation.x=state.yVel>0?-.08:.10;}
    else shoulders.rotation.x=0;
    if(crouching){torso.rotation.x=.18;legL.rotation.x=.42;legR.rotation.x=.42;armL.rotation.x=-.28;armR.rotation.x=-.28;}
