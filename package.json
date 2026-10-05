@@ -1,8 +1,1 @@
-{
-  "name": "Untaggable",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "start": "python3 -m http.server 8000"
-  }
-}
+{"name":"untaggable","version":"0.2.0","private":true,"scripts":{"start":"python3 -m http.server 8000","android:sync":"npx cap sync android","android:open":"npx cap open android"},"dependencies":{"@capacitor/android":"^7.4.3","@capacitor/core":"^7.4.3"},"devDependencies":{"@capacitor/cli":"^7.4.3"}}
