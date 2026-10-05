@@ -115,19 +115,19 @@ try{
  const backPatch=new THREE.Mesh(new THREE.BoxGeometry(.25,.29,.035),new THREE.MeshStandardMaterial({color:0x17202a,roughness:.75}));backPatch.position.set(0,1.26,-.35);runner.add(backPatch);
  const legL=new THREE.Mesh(new THREE.CapsuleGeometry(.145,.56,6,10),pants),legR=legL.clone();legL.position.set(-.17,.49,0);legR.position.set(.17,.49,0);runner.add(legL,legR);
  const shoeGeo=new THREE.BoxGeometry(.25,.17,.42),shoeL=new THREE.Mesh(shoeGeo,shoeMat),shoeR=shoeL.clone();shoeL.position.set(-.17,.09,.07);shoeR.position.set(.17,.09,.07);runner.add(shoeL,shoeR);
+ [neck,head,armL,armR,handL,handR].forEach(m=>m.userData.skinRole='skin');[torso,chest,waist].forEach(m=>m.userData.skinRole='shirt');[pelvis,legL,legR].forEach(m=>m.userData.skinRole='pants');[hair,hairBack,hairSideL,hairSideR].forEach(m=>m.userData.skinRole='hair');[shoeL,shoeR].forEach(m=>m.userData.skinRole='shoe');
  runner.position.set(0,0,10);
 // Offline tagger uses the same human model as the four playable runners.
 const bot=runner.clone(true);scene.add(bot);bot.position.set(0,0,17);
 let botCharacter='Gwen';
 function applyBotCharacter(name){
  botCharacter=name;const l=characterLooks[name];
- // Clone materials first so changing the bot never recolors the runner.
- bot.traverse(o=>{if(o.isMesh&&o.material)o.material=o.material.clone()});
- const meshes=[];bot.traverse(o=>{if(o.isMesh)meshes.push(o)});
- // Mirror runner material roles by source material colors/names through geometry order.
- const source=[];runner.traverse(o=>{if(o.isMesh)source.push(o)});
- meshes.forEach((m,i)=>{const s=source[i];if(!s)return;const hex=s.material.color?.getHex();if(hex===skin.color.getHex())m.material.color.setHex(l.skin);else if(hex===shirt.color.getHex())m.material.color.setHex(l.shirt);else if(hex===pants.color.getHex())m.material.color.setHex(l.pants);else if(hex===hairMat.color.getHex())m.material.color.setHex(l.hair);else if(hex===shoeMat.color.getHex())m.material.color.setHex(l.shoe)});
+ bot.traverse(o=>{if(!o.isMesh)return;if(!o.userData.botMaterialCloned){o.material=o.material.clone();o.userData.botMaterialCloned=true}
+  const role=o.userData.skinRole;if(role==='skin')o.material.color.setHex(l.skin);else if(role==='shirt')o.material.color.setHex(l.shirt);else if(role==='pants')o.material.color.setHex(l.pants);else if(role==='hair')o.material.color.setHex(l.hair);else if(role==='shoe')o.material.color.setHex(l.shoe);
+ });
  bot.scale.set(...l.scale);
+ const parts=[];bot.traverse(o=>{if(o.isMesh)parts.push(o)});
+ const hairParts=parts.filter(o=>o.userData.skinRole==='hair');if(hairParts[1])hairParts[1].visible=l.hairStyle==='long';if(hairParts[2])hairParts[2].visible=l.hairStyle==='sides';if(hairParts[3])hairParts[3].visible=l.hairStyle==='sides';
 }
 function chooseBotCharacter(){const choices=charNames.filter(n=>n!==selectedCharacter);applyBotCharacter(choices[Math.floor(Math.random()*choices.length)]);}
 const botState={yVel:0,onGround:true,support:null,facing:Math.PI,stamina:150,actionCooldown:0,slideTimer:0,parkourTimer:0,headStart:5,headStartDone:false};
@@ -175,7 +175,7 @@ document.getElementById('restartGame').addEventListener('click',()=>{
  game.paused=false;pauseMenu.style.display='none';game.round=1;resetRound();
 });
 document.getElementById('mainMenuBtn').addEventListener('click',()=>{
- game.paused=false;game.started=false;game.between=false;pauseMenu.style.display='none';pauseBtn.style.display='none';
+ game.paused=false;game.started=false;game.between=false;state.joyX=state.joyY=0;state.sprint=false;state.autoSprint=false;state.crouch=false;state.slide=false;sprintBtn?.classList.remove('auto','active');pauseMenu.style.display='none';pauseBtn.style.display='none';
  document.getElementById('menu').style.display='flex';game.round=1;game.time=45;
 });
 document.getElementById('startGame').addEventListener('click',()=>{
@@ -356,7 +356,7 @@ function endLook(e){if(e.pointerId===lookPointer)lookPointer=null}
 canvas.addEventListener('pointerup',endLook);canvas.addEventListener('pointercancel',endLook);
  function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
  function loop(now){requestAnimationFrame(loop);let dt=Math.min((now-last)/1000,.033);last=now;
-   if(game.started&&!game.between&&!game.paused){
+   if(game.started&&!game.between&&!game.paused&&botState.headStartDone){
      game.time=Math.max(0,game.time-dt);
      if(game.time<=0)finishRound('SURVIVED!');
    }
