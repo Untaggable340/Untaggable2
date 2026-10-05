@@ -558,10 +558,13 @@ document.getElementById('jump').addEventListener('pointerdown',jump);document.ge
    if(botTorso)botTorso.rotation.x=botState.slideTimer>0?.42:(moving?(wantsSprint?.11:.045):0);
    bot.scale.y=characterLooks[botCharacter].scale[1]*(botState.slideTimer>0?.66:1);
 
-   // A simple tag event for this prototype; reset the bot behind you so testing can continue.
+   // Require clear vertical overlap and no solid arena/route block between runner and bot before a tag can register.
    const tagDist=Math.hypot(runner.position.x-bot.position.x,runner.position.z-bot.position.z);
+   let tagBlocked=false;
    if(tagDist<.78&&Math.abs(bot.position.y-runner.position.y)<1.25){
-     finishRound('TAGGED!');
+     const mx=(runner.position.x+bot.position.x)*.5,mz=(runner.position.z+bot.position.z)*.5,tagY=Math.min(runner.position.y,bot.position.y)+.55;
+     for(const o of obstacles){if(tagY<o.h-.08&&insideXZ(o,mx,mz,.04)){tagBlocked=true;break}}
+     if(!tagBlocked)finishRound('TAGGED!');
    }
  }
  // Right-side free-look: ignore touches that begin on action buttons or joystick.
